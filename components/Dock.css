@@ -39,6 +39,17 @@
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
+@media (max-width: 768px) {
+  .dock-panel {
+    gap: 4px;
+    padding: 8px 12px;
+    max-width: 95vw;
+    overflow-x: auto;
+    justify-content: flex-start;
+    /* Allow scrolling if needed */
+  }
+}
+
 .dock-item {
   position: relative;
   display: flex;

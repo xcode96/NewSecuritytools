@@ -137,6 +137,14 @@ const App: React.FC = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showDataManager, setShowDataManager] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Apply Theme Effect
   useEffect(() => {
@@ -464,7 +472,12 @@ const App: React.FC = () => {
         {/* Dock - Top Positioned */}
         <div className="fixed top-6 z-40 flex justify-center w-full pointer-events-none transition-all duration-300">
           <div className="pointer-events-auto">
-            <Dock items={dockItems} />
+            <Dock
+              items={dockItems}
+              baseItemSize={isMobile ? 36 : 50}
+              magnification={isMobile ? 50 : 70}
+              distance={isMobile ? 100 : 200}
+            />
           </div>
         </div>
       </div>
