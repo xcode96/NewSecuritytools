@@ -1,9 +1,12 @@
+export type YouTuberCategory = 'Educational' | 'News' | 'Tutorials' | 'Career' | 'Live Hacking';
+
 export interface YouTuber {
     id: string;
     name: string;
     description: string; // inferred or generic since not strictly provided, but tags help.
     tags: string[];
     link: string;
+    category?: YouTuberCategory;
 }
 
 export const youtubersData: YouTuber[] = [

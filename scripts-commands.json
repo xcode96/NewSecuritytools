@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "export-data": "tsx scripts/exportData.ts",
+        "import-data": "tsx scripts/importData.ts"
+    }
+}

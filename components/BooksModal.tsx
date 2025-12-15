@@ -4,45 +4,114 @@ import {
     XMarkIcon,
     BookIcon,
     SearchIcon,
-    SparklesIcon
+    SparklesIcon,
+    PlusIcon,
+    PencilIcon,
+    TrashIcon
 } from './IconComponents';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface BooksModalProps {
     onClose: () => void;
     isOpen: boolean;
+    isAdmin?: boolean;
 }
 
-const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
-    const [activeCategory, setActiveCategory] = useState<BookCategory | 'All'>('All');
+const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
+    const [books, setBooks] = useState<any[]>(booksData);
+    const [activeCategory, setActiveCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState<any>(null);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') onClose();
         };
-        if (isOpen) window.addEventListener('keydown', handleKeyDown);
+        if (isOpen) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
     const filteredBooks = useMemo(() => {
-        return booksData.filter(book => {
+        return books.filter(book => {
             const matchesCategory = activeCategory === 'All' || book.category === activeCategory;
             const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 book.description.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
-    }, [activeCategory, searchQuery]);
+    }, [activeCategory, searchQuery, books]);
 
     const stats = useMemo(() => {
         return {
-            total: booksData.length,
-            redTeam: booksData.filter(b => b.category === 'Red Team').length,
-            blueTeam: booksData.filter(b => b.category === 'Blue Team').length,
-            totalPages: booksData.reduce((acc, curr) => acc + parseInt(curr.pages.split(' ')[0].replace(/,/g, '')), 0)
+            total: books.length,
+            redTeam: books.filter(b => b.category === 'Red Team').length,
+            blueTeam: books.filter(b => b.category === 'Blue Team').length,
+            // Parse "300 pages" -> 300
+            totalPages: books.reduce((acc, curr) => {
+                const pages = parseInt((curr.pages || '0').toString().split(' ')[0].replace(/,/g, '')) || 0;
+                return acc + pages;
+            }, 0)
         };
-    }, []);
+    }, [books]);
+
+    // Admin Handlers
+    const handleAddClick = () => {
+        setEditForm({
+            title: '',
+            author: '',
+            description: '',
+            category: 'General',
+            pages: '',
+            year: new Date().getFullYear().toString(),
+            amazon_link: '',
+            tags: ''
+        });
+        setIsEditing(true);
+    };
+
+    const handleEditClick = (book: any) => {
+        setEditForm({
+            ...book,
+            tags: Array.isArray(book.tags) ? book.tags.join(', ') : book.tags || ''
+        });
+        setIsEditing(true);
+    };
+
+    const handleDeleteClick = async (id: number) => {
+        if (window.confirm('Delete this book?')) {
+            setBooks(prev => prev.filter(b => b.id !== id));
+        }
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const payload = {
+            title: editForm.title,
+            author: editForm.author,
+            description: editForm.description,
+            category: editForm.category,
+            pages: editForm.pages,
+            year: editForm.year,
+            amazon_link: editForm.amazon_link,
+            tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+        };
+
+        if (editForm.id) {
+            setBooks(prev => prev.map(b => b.id === editForm.id ? { ...b, ...payload } : b));
+        } else {
+            const newBook = { ...payload, id: Date.now() }; // Local ID
+            setBooks(prev => [...prev, newBook]);
+        }
+        setIsEditing(false);
+        setEditForm(null);
+    };
+
 
     if (!isOpen) return null;
 
@@ -82,7 +151,7 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
                             Cybersecurity Library
                         </h1>
                         <p className="text-xl text-amber-100/80 max-w-2xl leading-relaxed">
-                            Curated collection of {booksData.length} essential books for Red Team, Blue Team, and General security studies.
+                            Curated collection of {books.length} essential books for Red Team, Blue Team, and General security studies.
                         </p>
                     </motion.div>
                 </div>
@@ -112,6 +181,14 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
 
                         {/* Search & Category Tabs */}
                         <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+                            {isAdmin && (
+                                <button
+                                    onClick={handleAddClick}
+                                    className="px-4 py-2 rounded-lg bg-amber-600 text-white font-bold flex items-center gap-2 hover:bg-amber-700 transition-colors shadow-lg shadow-amber-500/30"
+                                >
+                                    <PlusIcon className="w-4 h-4" /> Add Book
+                                </button>
+                            )}
                             <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl">
                                 {(['All', 'Blue Team', 'Red Team', 'General'] as const).map((cat) => (
                                     <button
@@ -145,16 +222,23 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
                             <motion.div
                                 key={book.id}
                                 whileHover={{ y: -5 }}
-                                className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
+                                className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 relative"
                             >
+                                {isAdmin && (
+                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                        <button onClick={(e) => { e.stopPropagation(); handleEditClick(book); }} className="p-1.5 bg-white dark:bg-slate-800 text-blue-500 rounded-lg shadow-sm hover:scale-110"><PencilIcon className="w-3 h-3" /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(book.id); }} className="p-1.5 bg-white dark:bg-slate-800 text-red-500 rounded-lg shadow-sm hover:scale-110"><TrashIcon className="w-3 h-3" /></button>
+                                    </div>
+                                )}
+
                                 <div className="p-6 flex-1 flex flex-col">
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             {book.year}
                                         </div>
                                         <div className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${book.category === 'Red Team' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
-                                                book.category === 'Blue Team' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
-                                                    'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                            book.category === 'Blue Team' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                                                'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                                             }`}>
                                             {book.category}
                                         </div>
@@ -173,7 +257,7 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
 
                                     <div className="mt-auto space-y-4">
                                         <div className="flex flex-wrap gap-2">
-                                            {book.tags.slice(0, 3).map((tag, i) => (
+                                            {(book.tags || []).slice(0, 3).map((tag: string, i: number) => (
                                                 <span key={i} className="text-[10px] font-bold px-2 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-md">
                                                     #{tag}
                                                 </span>
@@ -205,6 +289,66 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen }) => {
                     </div>
                 </div>
             </main>
+
+            {/* Edit Modal Overlay */}
+            <AnimatePresence>
+                {isEditing && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    >
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 p-6 overflow-y-auto max-h-[90vh]">
+                            <h3 className="text-xl font-bold mb-4 dark:text-white">{editForm?.id ? 'Edit Book' : 'Add New Book'}</h3>
+                            <form onSubmit={handleSave} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-slate-300">Title</label>
+                                    <input required type="text" value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-slate-300">Author</label>
+                                    <input required type="text" value={editForm.author} onChange={e => setEditForm({ ...editForm, author: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-slate-300">Description</label>
+                                    <textarea required value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" rows={3} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1 dark:text-slate-300">Category</label>
+                                        <select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500">
+                                            {['Blue Team', 'Red Team', 'General'].map(c => <option key={c} value={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1 dark:text-slate-300">Year</label>
+                                        <input required type="text" value={editForm.year} onChange={e => setEditForm({ ...editForm, year: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1 dark:text-slate-300">Pages (e.g. 500 pages)</label>
+                                        <input required type="text" value={editForm.pages} onChange={e => setEditForm({ ...editForm, pages: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-slate-300">Amazon/Buy Link</label>
+                                    <input required type="text" value={editForm.amazon_link} onChange={e => setEditForm({ ...editForm, amazon_link: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1 dark:text-slate-300">Tags (comma separated)</label>
+                                    <input type="text" value={editForm.tags} onChange={e => setEditForm({ ...editForm, tags: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-amber-500" />
+                                </div>
+                                <div className="flex justify-end gap-3 mt-6">
+                                    <button type="button" onClick={() => setIsEditing(false)} className="px-4 py-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+                                    <button type="submit" className="px-4 py-2 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700">Save Book</button>
+                                </div>
+                            </form>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

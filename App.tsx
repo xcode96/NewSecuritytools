@@ -18,13 +18,14 @@ import DownloadsModal from './components/DownloadsModal';
 import FrameworksModal from './components/FrameworksModal';
 import BreachServicesModal from './components/BreachServicesModal';
 import YouTubersModal from './components/YouTubersModal';
+import DataManagerModal from './components/DataManagerModal';
 
 import type { Tool, GeneratedToolDetails, ToolFormData, SubArticle, CategoryInfo, UserProfile } from './types';
 import { TOOLS } from './data/constants';
-import { fetchTools, fetchCategories, addTool, updateTool, deleteTool, addCategory, updateCategory, deleteCategory } from './services/supabaseService';
 import { signInWithGoogle, signOut as authSignOut, getUserProfile, onAuthStateChange, getSession } from './services/authService';
 import { UserAuthButton } from './components/UserAuthButton';
 import { ToolSubmissionModal } from './components/ToolSubmissionModal';
+import { ToolFormModal } from './components/ToolFormModal';
 import Dock from './components/Dock';
 import {
   AllCategoriesIcon,
@@ -45,6 +46,8 @@ import {
   PlusIcon,
   LoginIcon,
   LogoutIcon,
+  DownloadIcon as DataIcon,
+  UploadIcon,
   MenuIcon
 } from './components/IconComponents';
 
@@ -60,7 +63,20 @@ type Theme = 'light' | 'dark';
 const App: React.FC = () => {
 
   console.log('App component rendering...');
-  const [tools, setTools] = useState<Tool[]>([]);
+  const [tools, setTools] = useState<Tool[]>(() => {
+    try {
+      const savedTools = localStorage.getItem('tools');
+      if (savedTools) {
+        const parsedTools = JSON.parse(savedTools) as Tool[];
+        // Ensure all saved tools have IDs
+        return parsedTools.map(t => ({ ...t, id: t.id || crypto.randomUUID() }));
+      }
+    } catch (error) {
+      console.error("Failed to parse tools from localStorage:", error);
+    }
+    // Fallback to default tools with generated IDs
+    return TOOLS.map(t => ({ ...t, id: crypto.randomUUID() }));
+  });
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -69,7 +85,7 @@ const App: React.FC = () => {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
   const [showAdminLogin, setShowAdminLogin] = useState<boolean>(false);
   const [articleEditorState, setArticleEditorState] = useState<ArticleEditorState | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
@@ -115,6 +131,7 @@ const App: React.FC = () => {
   // Modals state
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [showDataManager, setShowDataManager] = useState<boolean>(false);
 
   // Apply Theme Effect
   useEffect(() => {
@@ -183,55 +200,41 @@ const App: React.FC = () => {
   };
 
   const handleSaveTool = async (formData: ToolFormData) => {
-    try {
-      if (editingTool) {
-        // updateTool expects (originalName, fullToolObject)
-        // We need to ensure we pass the full object associated with the FormData
-        const mergedTool: Tool = { ...editingTool, ...formData };
-
-        const success = await updateTool(editingTool.name, mergedTool);
-        if (success) {
-          setTools(prev => prev.map(t => t.id === editingTool.id ? mergedTool : t));
-        }
-        setEditingTool(null);
-      } else {
-        // addTool expects Tool (but formData is ToolFormData). 
-        const newToolPayload: Tool = {
-          ...formData,
-          articles: [],
-          isHidden: false,
-        } as Tool;
-
-        const success = await addTool(newToolPayload);
-        if (success) {
-          // Re-fetch to be safe
-          const freshTools = await fetchTools();
-          setTools(freshTools);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to save tool:", error);
-      alert("Failed to save tool. See console for details.");
+    // updateTool expects (originalName, fullToolObject)
+    // We need to ensure we pass the full object associated with the FormData
+    // Static mode: Just update state
+    if (editingTool) {
+      const mergedTool: Tool = { ...editingTool, ...formData };
+      setTools(prev => prev.map(t => t.id === editingTool.id ? mergedTool : t));
+      setEditingTool(null);
+    } else {
+      const newToolPayload: Tool = {
+        ...formData,
+        articles: [],
+        isHidden: false,
+        id: Date.now().toString() // Generate ID for static add
+      } as Tool;
+      setTools(prev => [...prev, newToolPayload]);
     }
   };
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('tools', JSON.stringify(tools));
+    } catch (error) {
+      console.error("Failed to save tools to localStorage (Quota Exceeded?):", error);
+      // Optionally notify user or handle gracefully
+    }
+  }, [tools]);
+
   const handleDeleteTool = async (toolId: string) => {
-    // We need the name for the service
     const tool = tools.find(t => t.id === toolId);
     if (!tool) return;
 
     if (window.confirm(`Are you sure you want to delete ${tool.name}?`)) {
-      try {
-        const success = await deleteTool(tool.name);
-        if (success) {
-          setTools(prev => prev.filter(t => t.id !== toolId));
-          if (selectedTool?.id === toolId) {
-            setSelectedTool(null);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to delete tool:", error);
-        alert("Failed to delete tool. See console for details.");
+      setTools(prev => prev.filter(t => t.id !== toolId));
+      if (selectedTool?.id === toolId) {
+        setSelectedTool(null);
       }
     }
   };
@@ -249,20 +252,11 @@ const App: React.FC = () => {
     const toolToUpdate = tools.find(t => t.name === toolName);
     if (!toolToUpdate) return;
 
-    try {
-      const updatedToolObj: Tool = { ...toolToUpdate, articles };
+    const updatedToolObj: Tool = { ...toolToUpdate, articles };
+    setTools(prev => prev.map(t => t.id === toolToUpdate.id ? updatedToolObj : t));
 
-      const success = await updateTool(toolToUpdate.name, updatedToolObj);
-      if (success) {
-        setTools(prev => prev.map(t => t.id === toolToUpdate.id ? updatedToolObj : t));
-      }
-      setArticleEditorState(null);
-      setSelectedTool(updatedToolObj);
-
-    } catch (error) {
-      console.error("Failed to save article:", error);
-      alert("Failed to save article.");
-    }
+    setArticleEditorState(null);
+    setSelectedTool(updatedToolObj);
   };
 
 
@@ -282,55 +276,23 @@ const App: React.FC = () => {
 
   // Category Management Handlers
   const handleAddCategory = async (name: string) => {
-    const newCategory = await addCategory({ name, color: '#64748b' } as CategoryInfo); // minimal
-    if (newCategory) {
-      const fresh = await fetchCategories();
-      setCategories(fresh);
-    }
+    // Static: just update state
+    const newCategory: CategoryInfo = { name, color: '#64748b' };
+    setCategories(prev => [...prev, newCategory]);
   };
 
   const handleUpdateCategory = async (id: any, name: string) => { // ID type?
-    const cat = categories.find(c => c.id === id);
-    if (!cat) return;
-
-    const success = await updateCategory(cat.name, { ...cat, name });
-    if (success) {
-      setCategories(prev => prev.map(c => c.id === id ? { ...c, name } : c));
-    }
+    // For static, ID might not exist well, assume name match or whatever logic
+    // Actually categories state is used
+    setCategories(prev => prev.map(c => c.id === id ? { ...c, name } : c));
   };
 
   const handleDeleteCategory = async (id: any) => {
-    const cat = categories.find(c => c.id === id);
-    if (!cat) return;
-
-    const success = await deleteCategory(cat.name);
-    if (success) {
-      setCategories(prev => prev.filter(c => c.id !== id));
-      if (activeCategory === cat.name) setActiveCategory('All');
-    }
+    setCategories(prev => prev.filter(c => c.id !== id));
+    // if (activeCategory === cat.name) setActiveCategory('All'); // logic needed
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const [fetchedTools, fetchedCategories] = await Promise.all([
-          fetchTools(),
-          fetchCategories()
-        ]);
-        setTools(fetchedTools);
-        if (fetchedCategories.length > 0) {
-          setCategories(fetchedCategories);
-        }
-        setIsLoading(false);
-      } catch (err: any) {
-        console.error("Error loading data:", err);
-        setLoadingError(err.message || 'Failed to load data');
-        setIsLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+  // No loadData effect needed for static
 
 
   const filteredTools = useMemo(() => {
@@ -376,6 +338,7 @@ const App: React.FC = () => {
     ...(isAdminLoggedIn
       ? [
         { icon: <GridIcon className="w-6 h-6" />, label: 'Manage', onClick: () => setActiveModal('categoryManager') },
+        { icon: <DataIcon className="w-6 h-6" />, label: 'Data', onClick: () => setShowDataManager(true) },
         { icon: <LogoutIcon className="w-6 h-6" />, label: 'Sign Out', onClick: () => setIsAdminLoggedIn(false) }
       ]
       : [{ icon: <LoginIcon className="w-6 h-6" />, label: 'Admin', onClick: () => setShowAdminLogin(true) }]
@@ -414,7 +377,7 @@ const App: React.FC = () => {
 
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300">
 
-        <main className="flex-1 container mx-auto px-4 pb-32 pt-12">
+        <main className="flex-1 container mx-auto px-4 pb-32 pt-32">
           {/* Tool Grid */}
           {filteredTools.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -433,9 +396,6 @@ const App: React.FC = () => {
                       try {
                         const updated = { ...tool, isHidden: !tool.isHidden };
                         setTools(prev => prev.map(t => t.id === tool.id ? updated : t));
-
-                        // Pass full tool object to update
-                        await updateTool(tool.name, updated);
                       } catch (e) { console.error(e); }
                     }}
                   />
@@ -470,8 +430,8 @@ const App: React.FC = () => {
 
         </main>
 
-        {/* Dock - Bottom Positioned */}
-        <div className="fixed bottom-6 z-40 flex justify-center w-full pointer-events-none transition-all duration-300">
+        {/* Dock - Top Positioned */}
+        <div className="fixed top-6 z-40 flex justify-center w-full pointer-events-none transition-all duration-300">
           <div className="pointer-events-auto">
             <Dock items={dockItems} />
           </div>
@@ -499,12 +459,12 @@ const App: React.FC = () => {
       )}
 
       {editingTool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded">
-            <h2>Edit Tool (Placeholder)</h2>
-            <button onClick={() => setEditingTool(null)}>Close</button>
-          </div>
-        </div>
+        <ToolFormModal
+          tool={editingTool.id ? editingTool : null}
+          categories={categories}
+          onClose={() => setEditingTool(null)}
+          onSave={handleSaveTool}
+        />
       )}
 
       {articleEditorState && (
@@ -515,14 +475,14 @@ const App: React.FC = () => {
         />
       )}
 
-      <UsefulLinksModal isOpen={activeModal === 'links'} onClose={() => setActiveModal(null)} />
-      <BooksModal isOpen={activeModal === 'books'} onClose={() => setActiveModal(null)} />
-      <PlatformsModal isOpen={activeModal === 'platforms'} onClose={() => setActiveModal(null)} />
-      <CertificationsModal isOpen={activeModal === 'certs'} onClose={() => setActiveModal(null)} />
-      <DownloadsModal isOpen={activeModal === 'downloads'} onClose={() => setActiveModal(null)} />
-      <FrameworksModal isOpen={activeModal === 'frameworks'} onClose={() => setActiveModal(null)} />
-      <BreachServicesModal isOpen={activeModal === 'breach'} onClose={() => setActiveModal(null)} />
-      <YouTubersModal isOpen={activeModal === 'youtubers'} onClose={() => setActiveModal(null)} />
+      <UsefulLinksModal isOpen={activeModal === 'links'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <BooksModal isOpen={activeModal === 'books'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <PlatformsModal isOpen={activeModal === 'platforms'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <CertificationsModal isOpen={activeModal === 'certs'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <DownloadsModal isOpen={activeModal === 'downloads'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <FrameworksModal isOpen={activeModal === 'frameworks'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <BreachServicesModal isOpen={activeModal === 'breach'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <YouTubersModal isOpen={activeModal === 'youtubers'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <CategoryManagerModal isOpen={activeModal === 'categoryManager'} onClose={() => setActiveModal(null)} categories={categories} onAdd={handleAddCategory} onUpdate={handleUpdateCategory} onDelete={handleDeleteCategory} />
 
       {activeModal === 'submission' && (
@@ -535,6 +495,8 @@ const App: React.FC = () => {
           onClose={() => setActiveModal(null)}
         />
       )}
+
+      <DataManagerModal isOpen={showDataManager} onClose={() => setShowDataManager(false)} tools={tools} />
 
     </div>
   );

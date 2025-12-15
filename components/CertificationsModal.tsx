@@ -1,21 +1,33 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { certificationsData, CertificationCategory } from '../data/certifications';
+import { certificationsData as staticCertificationsData, Certification, CertificationCategory } from '../data/certifications';
 import {
     XMarkIcon,
     AwardIcon,
     SearchIcon,
     ShieldCheckIcon,
+    PencilIcon,
+    TrashIcon,
+    PlusIcon
 } from './IconComponents';
 import { motion } from 'motion/react';
+// Removed Supabase imports
+import CertificationFormModal from './CertificationFormModal';
 
 interface CertificationsModalProps {
     onClose: () => void;
     isOpen: boolean;
+    isAdmin?: boolean;
 }
 
-const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOpen }) => {
+const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
     const [activeCategory, setActiveCategory] = useState<CertificationCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [certifications, setCertifications] = useState<Certification[]>(staticCertificationsData);
+    const [loading, setLoading] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingCert, setEditingCert] = useState<Certification | undefined>(undefined);
+
+    // Effect removed as we load static data directly into state
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -25,15 +37,42 @@ const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOp
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
+    const handleSave = async (certData: Omit<Certification, 'id'> | Certification) => {
+        if (editingCert) {
+            // Update local state
+            setCertifications(prev => prev.map(c => c.id === (certData as Certification).id ? (certData as Certification) : c));
+        } else {
+            // Add to local state
+            const newCert = { ...certData, id: Date.now().toString() } as Certification;
+            setCertifications(prev => [...prev, newCert]);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm('Are you sure you want to delete this certification?')) {
+            setCertifications(prev => prev.filter(c => c.id !== id));
+        }
+    };
+
+    const openAddModal = () => {
+        setEditingCert(undefined);
+        setIsFormOpen(true);
+    }
+    const openEditModal = (cert: Certification) => {
+        setEditingCert(cert);
+        setIsFormOpen(true);
+    }
+
+
     const filteredCerts = useMemo(() => {
-        return certificationsData.filter(cert => {
+        return certifications.filter(cert => {
             const matchesCategory = activeCategory === 'All' || cert.category === activeCategory;
             const matchesSearch = cert.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 cert.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 cert.provider.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
-    }, [activeCategory, searchQuery]);
+    }, [activeCategory, searchQuery, certifications]);
 
     if (!isOpen) return null;
 
@@ -75,6 +114,15 @@ const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOp
                         <p className="text-xl text-sky-100/80 max-w-2xl leading-relaxed">
                             Structured career paths and industry-standard certifications for Red Team, Blue Team, and Security Management.
                         </p>
+                        {isAdmin && (
+                            <button
+                                onClick={openAddModal}
+                                className="mt-6 flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl backdrop-blur-md border border-white/20 transition-all font-bold"
+                            >
+                                <PlusIcon className="w-5 h-5" />
+                                Add Certification
+                            </button>
+                        )}
                     </motion.div>
                 </div>
             </motion.header>
@@ -165,8 +213,18 @@ const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOp
                             <motion.div
                                 key={cert.id}
                                 whileHover={{ y: -5 }}
-                                className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
+                                className="group flex flex-col bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 relative"
                             >
+                                {isAdmin && (
+                                    <div className="absolute top-2 right-2 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={(e) => { e.stopPropagation(); openEditModal(cert) }} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-white backdrop-blur-md">
+                                            <PencilIcon className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(cert.id) }} className="p-1.5 bg-red-500/80 hover:bg-red-500 rounded-lg text-white backdrop-blur-md">
+                                            <TrashIcon className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
                                 <div className="p-6 flex-1 flex flex-col">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${cert.category === 'Red Team' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
@@ -237,6 +295,12 @@ const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOp
                     </div>
                 </div>
             </main>
+            <CertificationFormModal
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                onSave={handleSave}
+                initialData={editingCert}
+            />
         </div>
     );
 };

@@ -130,7 +130,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
       </button>
 
       {isAdmin && (
-        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={handleVisibilityClick}
             className={`p-2 rounded-full backdrop-blur-md text-white hover:scale-110 transition-transform shadow-lg ${isHidden ? 'bg-red-500/80 border border-red-400' : 'bg-slate-700/50 border border-white/10'}`}

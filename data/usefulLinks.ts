@@ -15,6 +15,7 @@ export interface UsefulLink {
     description: string;
     category: LinkCategory;
     icon: string; // Emoji character
+    icon_name?: string; // Icon component name
     tags: string[];
     url: string;
 }

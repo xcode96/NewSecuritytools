@@ -12,6 +12,8 @@ export interface Platform {
     link: string;
 }
 
+export type PlatformCategory = 'Salesforce' | 'ServiceNow' | 'SAP' | 'Workday' | 'Oracle' | 'Microsoft 365';
+
 export const platformsData: Platform[] = [
     {
         id: '1',

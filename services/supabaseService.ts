@@ -234,3 +234,275 @@ export const deleteTool = async (toolName: string): Promise<boolean> => {
     }
     return true;
 };
+
+// Books
+export const fetchBooks = async (): Promise<any[]> => {
+    const { data, error } = await supabase
+        .from('books')
+        .select('*')
+        .order('title');
+
+    if (error) {
+        console.error('Error fetching books:', error);
+        return [];
+    }
+    return data || [];
+};
+
+export const addBook = async (book: any): Promise<boolean> => {
+    const { error } = await supabase
+        .from('books')
+        .insert([book]);
+
+    if (error) {
+        console.error('Error adding book:', error);
+        return false;
+    }
+    return true;
+};
+
+export const updateBook = async (id: number, book: any): Promise<boolean> => {
+    const { error } = await supabase
+        .from('books')
+        .update(book)
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating book:', error);
+        return false;
+    }
+    return true;
+};
+
+export const deleteBook = async (id: number): Promise<boolean> => {
+    const { error } = await supabase
+        .from('books')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error deleting book:', error);
+        return false;
+    }
+    return true;
+};
+
+// Useful Links
+export const fetchUsefulLinks = async (): Promise<any[]> => {
+    const { data, error } = await supabase
+        .from('useful_links')
+        .select('*')
+        .order('name');
+
+    if (error) {
+        console.error('Error fetching useful links:', error);
+        return [];
+    }
+    return data || [];
+};
+
+export const addUsefulLink = async (link: any): Promise<boolean> => {
+    const { error } = await supabase
+        .from('useful_links')
+        .insert([link]);
+
+    if (error) {
+        console.error('Error adding useful link:', error);
+        return false;
+    }
+    return true;
+};
+
+export const updateUsefulLink = async (id: number, link: any): Promise<boolean> => {
+    const { error } = await supabase
+        .from('useful_links')
+        .update(link)
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating useful link:', error);
+        return false;
+    }
+    return true;
+};
+
+export const deleteUsefulLink = async (id: number): Promise<boolean> => {
+    const { error } = await supabase
+        .from('useful_links')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error deleting useful link:', error);
+        return false;
+    }
+    return true;
+};
+
+// --- Platforms ---
+export const fetchPlatforms = async () => {
+    const { data, error } = await supabase.from('platforms').select('*').order('name');
+    if (error) return console.error('Error fetching platforms:', error), [];
+    return data || [];
+};
+export const addPlatform = async (item: any) => {
+    const { error } = await supabase.from('platforms').insert([item]);
+    return !error;
+};
+export const updatePlatform = async (id: number, item: any) => {
+    const { error } = await supabase.from('platforms').update(item).eq('id', id);
+    return !error;
+};
+export const deletePlatform = async (id: number) => {
+    const { error } = await supabase.from('platforms').delete().eq('id', id);
+    return !error;
+};
+
+// --- Certifications ---
+export const fetchCertifications = async () => {
+    const { data, error } = await supabase.from('certifications').select('*').order('name');
+    if (error) return console.error('Error fetching certifications:', error), [];
+
+    // Map snake_case to camelCase
+    return (data || []).map((item: any) => ({
+        ...item,
+        jobMarket: item.job_market,
+        examFormat: item.exam_format,
+        keySkills: item.key_skills,
+        careerPaths: item.career_paths
+    }));
+};
+
+export const addCertification = async (item: any) => {
+    // Map camelCase to snake_case
+    const dbItem = {
+        code: item.code,
+        name: item.name,
+        provider: item.provider,
+        category: item.category,
+        level: item.level,
+        rating: item.rating,
+        difficulty: item.difficulty,
+        popularity: item.popularity,
+        job_market: item.jobMarket,
+        description: item.description,
+        duration: item.duration,
+        cost: item.cost,
+        prerequisites: item.prerequisites,
+        exam_format: item.examFormat,
+        key_skills: item.keySkills,
+        career_paths: item.careerPaths,
+        link: item.link
+    };
+
+    const { error } = await supabase.from('certifications').insert([dbItem]);
+    return !error;
+};
+
+export const updateCertification = async (id: number, item: any) => {
+    // Map camelCase to snake_case
+    const dbItem = {
+        code: item.code,
+        name: item.name,
+        provider: item.provider,
+        category: item.category,
+        level: item.level,
+        rating: item.rating,
+        difficulty: item.difficulty,
+        popularity: item.popularity,
+        job_market: item.jobMarket,
+        description: item.description,
+        duration: item.duration,
+        cost: item.cost,
+        prerequisites: item.prerequisites,
+        exam_format: item.examFormat,
+        key_skills: item.keySkills,
+        career_paths: item.careerPaths,
+        link: item.link
+    };
+
+    const { error } = await supabase.from('certifications').update(dbItem).eq('id', id);
+    return !error;
+};
+
+export const deleteCertification = async (id: number) => {
+    const { error } = await supabase.from('certifications').delete().eq('id', id);
+    return !error;
+};
+
+// --- Downloads ---
+export const fetchDownloads = async () => {
+    const { data, error } = await supabase.from('downloads').select('*').order('name');
+    if (error) return console.error('Error fetching downloads:', error), [];
+    return data || [];
+};
+export const addDownload = async (item: any) => {
+    const { error } = await supabase.from('downloads').insert([item]);
+    return !error;
+};
+export const updateDownload = async (id: number, item: any) => {
+    const { error } = await supabase.from('downloads').update(item).eq('id', id);
+    return !error;
+};
+export const deleteDownload = async (id: number) => {
+    const { error } = await supabase.from('downloads').delete().eq('id', id);
+    return !error;
+};
+
+// --- Frameworks ---
+export const fetchFrameworks = async () => {
+    const { data, error } = await supabase.from('frameworks').select('*').order('name');
+    if (error) return console.error('Error fetching frameworks:', error), [];
+    return data || [];
+};
+export const addFramework = async (item: any) => {
+    const { error } = await supabase.from('frameworks').insert([item]);
+    return !error;
+};
+export const updateFramework = async (id: number, item: any) => {
+    const { error } = await supabase.from('frameworks').update(item).eq('id', id);
+    return !error;
+};
+export const deleteFramework = async (id: number) => {
+    const { error } = await supabase.from('frameworks').delete().eq('id', id);
+    return !error;
+};
+
+// --- Breach Services ---
+export const fetchBreachServices = async () => {
+    const { data, error } = await supabase.from('breach_services').select('*').order('name');
+    if (error) return console.error('Error fetching breach services:', error), [];
+    return data || [];
+};
+export const addBreachService = async (item: any) => {
+    const { error } = await supabase.from('breach_services').insert([item]);
+    return !error;
+};
+export const updateBreachService = async (id: number, item: any) => {
+    const { error } = await supabase.from('breach_services').update(item).eq('id', id);
+    return !error;
+};
+export const deleteBreachService = async (id: number) => {
+    const { error } = await supabase.from('breach_services').delete().eq('id', id);
+    return !error;
+};
+
+// --- YouTubers ---
+export const fetchYouTubers = async () => {
+    const { data, error } = await supabase.from('youtubers').select('*').order('name');
+    if (error) return console.error('Error fetching youtubers:', error), [];
+    return data || [];
+};
+export const addYouTuber = async (item: any) => {
+    const { error } = await supabase.from('youtubers').insert([item]);
+    return !error;
+};
+export const updateYouTuber = async (id: number, item: any) => {
+    const { error } = await supabase.from('youtubers').update(item).eq('id', id);
+    return !error;
+};
+export const deleteYouTuber = async (id: number) => {
+    const { error } = await supabase.from('youtubers').delete().eq('id', id);
+    return !error;
+};
+
