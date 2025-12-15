@@ -235,9 +235,13 @@ const App: React.FC = () => {
       localStorage.setItem('tools', JSON.stringify(tools));
     } catch (error) {
       console.error("Failed to save tools to localStorage (Quota Exceeded?):", error);
-      // Optionally notify user or handle gracefully
     }
   }, [tools]);
+
+  // Persist Categories
+  useEffect(() => {
+    localStorage.setItem('categories', JSON.stringify(categories));
+  }, [categories]);
 
   const handleDeleteTool = async (toolId: string) => {
     const tool = tools.find(t => t.id === toolId);

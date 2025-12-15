@@ -19,7 +19,22 @@ interface YouTubersModalProps {
 }
 
 const YouTubersModal: React.FC<YouTubersModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [youtubers, setYoutubers] = useState<any[]>(youtubersData);
+    const [youtubers, setYoutubers] = useState<any[]>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('youtubers');
+                return saved ? JSON.parse(saved) : youtubersData;
+            } catch (e) {
+                console.warn("Failed to parse youtubers from localStorage", e);
+                return youtubersData;
+            }
+        }
+        return youtubersData;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('youtubers', JSON.stringify(youtubers));
+    }, [youtubers]);
     const [activeCategory, setActiveCategory] = useState<YouTuberCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditing, setIsEditing] = useState(false);

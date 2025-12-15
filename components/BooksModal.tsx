@@ -18,7 +18,22 @@ interface BooksModalProps {
 }
 
 const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [books, setBooks] = useState<any[]>(booksData);
+    const [books, setBooks] = useState<any[]>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('books');
+                return saved ? JSON.parse(saved) : booksData;
+            } catch (e) {
+                console.warn("Failed to parse books from localStorage", e);
+                return booksData;
+            }
+        }
+        return booksData;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('books', JSON.stringify(books));
+    }, [books]);
     const [activeCategory, setActiveCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);

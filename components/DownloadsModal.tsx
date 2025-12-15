@@ -18,7 +18,22 @@ interface DownloadsModalProps {
 }
 
 const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [downloads, setDownloads] = useState<any[]>(downloadsData);
+    const [downloads, setDownloads] = useState<any[]>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('downloads');
+                return saved ? JSON.parse(saved) : downloadsData;
+            } catch (e) {
+                console.warn("Failed to parse downloads from localStorage", e);
+                return downloadsData;
+            }
+        }
+        return downloadsData;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('downloads', JSON.stringify(downloads));
+    }, [downloads]);
     const [activeCategory, setActiveCategory] = useState<DownloadCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditing, setIsEditing] = useState(false);
