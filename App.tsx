@@ -82,7 +82,12 @@ const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [aiCache, setAiCache] = useState<Map<string, GeneratedToolDetails>>(new Map());
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('isAdminLoggedIn') === 'true';
+    }
+    return false;
+  });
   const [showAdminLogin, setShowAdminLogin] = useState<boolean>(false);
   const [articleEditorState, setArticleEditorState] = useState<ArticleEditorState | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -190,6 +195,7 @@ const App: React.FC = () => {
 
   const handleAdminLogin = (status: boolean) => {
     setIsAdminLoggedIn(status);
+    localStorage.setItem('isAdminLoggedIn', String(status));
     if (status) {
       setShowAdminLogin(false);
     }
@@ -400,7 +406,7 @@ const App: React.FC = () => {
 
         <main className="flex-1 container mx-auto px-4 pb-32 pt-32">
           {/* Tool Grid */}
-          {filteredTools.length > 0 ? (
+          {filteredTools.length > 0 || isAdminLoggedIn ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredTools.map(tool => (
                 <div key={tool.id} className="h-[280px]"> {/* Fixed height container */}
@@ -426,7 +432,7 @@ const App: React.FC = () => {
               {isAdminLoggedIn && (
                 <button
                   onClick={() => setEditingTool({
-                    id: '', name: '', category: 'Network Scanning & Analysis',
+                    id: '', name: '', category: activeCategory !== 'All' && activeCategory !== 'Favorites' ? activeCategory : 'Network Scanning & Analysis',
                     description: '', url: '', color: '#3b82f6', command: '',
                     tags: []
                   } as Tool)}
@@ -497,6 +503,7 @@ const App: React.FC = () => {
         />
       )}
 
+      <AboutModal isOpen={activeModal === 'about'} onClose={() => setActiveModal(null)} />
       <UsefulLinksModal isOpen={activeModal === 'links'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <BooksModal isOpen={activeModal === 'books'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <PlatformsModal isOpen={activeModal === 'platforms'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
