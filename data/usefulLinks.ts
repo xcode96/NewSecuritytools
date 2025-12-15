@@ -1,0 +1,500 @@
+export type LinkCategory =
+    | 'OSINT & Investigation'
+    | 'Web Security Testing'
+    | 'Malware Analysis'
+    | 'Vulnerability Research'
+    | 'Privacy & Anonymity'
+    | 'Forensics & Analysis'
+    | 'Social Engineering'
+    | 'Cryptography & Encoding'
+    | 'Network Analysis';
+
+export interface UsefulLink {
+    id: string;
+    name: string;
+    description: string;
+    category: LinkCategory;
+    icon: string; // Emoji character
+    tags: string[];
+    url: string;
+}
+
+export const usefulLinksData: UsefulLink[] = [
+    // OSINT & Investigation
+    {
+        id: '1',
+        name: 'Whois Lookup',
+        description: 'Domain registration information and ownership details',
+        category: 'OSINT & Investigation',
+        icon: '🔍',
+        tags: ['Domain', 'Registration', 'Ownership'],
+        url: 'https://who.is/'
+    },
+    {
+        id: '2',
+        name: 'Wayback Machine',
+        description: 'Internet Archive - view historical versions of websites',
+        category: 'OSINT & Investigation',
+        icon: '📚',
+        tags: ['Archive', 'History', 'Snapshots'],
+        url: 'https://archive.org/web/'
+    },
+    {
+        id: '3',
+        name: 'Shodan',
+        description: 'Search engine for Internet-connected devices and services',
+        category: 'OSINT & Investigation',
+        icon: '🌐',
+        tags: ['IoT', 'Devices', 'Services'],
+        url: 'https://www.shodan.io/'
+    },
+    {
+        id: '4',
+        name: 'IP Location',
+        description: 'Geolocation and information about IP addresses',
+        category: 'OSINT & Investigation',
+        icon: '📍',
+        tags: ['IP', 'Geolocation', 'ISP'],
+        url: 'https://www.iplocation.net/'
+    },
+    {
+        id: '5',
+        name: 'URLScan.io',
+        description: 'URL and website scanner for security analysis',
+        category: 'OSINT & Investigation',
+        icon: '🔎',
+        tags: ['URL', 'Scanner', 'Analysis'],
+        url: 'https://urlscan.io/'
+    },
+    {
+        id: '6',
+        name: 'Have I Been Pwned',
+        description: 'Check if your email has been compromised in data breaches',
+        category: 'OSINT & Investigation',
+        icon: '💔',
+        tags: ['Breach', 'Email', 'Compromise'],
+        url: 'https://haveibeenpwned.com/'
+    },
+    {
+        id: '7',
+        name: 'IntelX',
+        description: 'Search engine for leaked data, documents, and credentials',
+        category: 'OSINT & Investigation',
+        icon: '🕵️',
+        tags: ['Intelligence', 'Leaks', 'Search'],
+        url: 'https://intelx.io/'
+    },
+    {
+        id: '8',
+        name: 'TinEye',
+        description: 'Reverse image search engine',
+        category: 'OSINT & Investigation',
+        icon: '🖼️',
+        tags: ['Image', 'Reverse', 'Search'],
+        url: 'https://tineye.com/'
+    },
+    // Web Security Testing
+    {
+        id: '9',
+        name: 'Security Headers',
+        description: 'Analyze HTTP security headers of websites',
+        category: 'Web Security Testing',
+        icon: '🛡️',
+        tags: ['Headers', 'HTTP', 'Security'],
+        url: 'https://securityheaders.com/'
+    },
+    {
+        id: '10',
+        name: 'SSL Labs Test',
+        description: 'Deep analysis of SSL/TLS configuration',
+        category: 'Web Security Testing',
+        icon: '🔒',
+        tags: ['SSL', 'TLS', 'Certificate'],
+        url: 'https://www.ssllabs.com/ssltest/'
+    },
+    {
+        id: '11',
+        name: 'Mozilla Observatory',
+        description: 'Website security scanner and analyzer',
+        category: 'Web Security Testing',
+        icon: '🔭',
+        tags: ['Mozilla', 'Scanner', 'Analysis'],
+        url: 'https://observatory.mozilla.org/'
+    },
+    {
+        id: '12',
+        name: 'Pentest Tools',
+        description: 'Online penetration testing tools collection',
+        category: 'Web Security Testing',
+        icon: '⚔️',
+        tags: ['Pentest', 'Tools', 'Online'],
+        url: 'https://pentest-tools.com/'
+    },
+    {
+        id: '13',
+        name: 'Burp Suite',
+        description: 'Web application security testing platform',
+        category: 'Web Security Testing',
+        icon: '🕷️',
+        tags: ['Burp', 'Proxy', 'Testing'],
+        url: 'https://portswigger.net/burp'
+    },
+    {
+        id: '14',
+        name: 'OWASP ZAP',
+        description: 'Free web application security scanner',
+        category: 'Web Security Testing',
+        icon: '⚡',
+        tags: ['OWASP', 'Scanner', 'Free'],
+        url: 'https://www.zaproxy.org/'
+    },
+    // Malware Analysis
+    {
+        id: '15',
+        name: 'VirusTotal',
+        description: 'Analyze suspicious files and URLs with multiple antivirus engines',
+        category: 'Malware Analysis',
+        icon: '🦠',
+        tags: ['Antivirus', 'Scanner', 'Analysis'],
+        url: 'https://www.virustotal.com/'
+    },
+    {
+        id: '16',
+        name: 'Hybrid Analysis',
+        description: 'Free malware analysis service powered by Falcon Sandbox',
+        category: 'Malware Analysis',
+        icon: '🔬',
+        tags: ['Malware', 'Sandbox', 'Analysis'],
+        url: 'https://www.hybrid-analysis.com/'
+    },
+    {
+        id: '17',
+        name: 'Any.run',
+        description: 'Interactive online malware analysis sandbox',
+        category: 'Malware Analysis',
+        icon: '🏃',
+        tags: ['Interactive', 'Sandbox', 'Online'],
+        url: 'https://any.run/'
+    },
+    {
+        id: '18',
+        name: 'Joe Sandbox',
+        description: 'Deep malware analysis with Joe Security',
+        category: 'Malware Analysis',
+        icon: '🏖️',
+        tags: ['Deep', 'Analysis', 'Security'],
+        url: 'https://www.joesecurity.org/'
+    },
+    {
+        id: '19',
+        name: 'Malware Bazaar',
+        description: 'Malware sample sharing platform',
+        category: 'Malware Analysis',
+        icon: '🏪',
+        tags: ['Samples', 'Sharing', 'Database'],
+        url: 'https://bazaar.abuse.ch/'
+    },
+    {
+        id: '20',
+        name: 'URLhaus',
+        description: 'Malicious URL sharing and tracking',
+        category: 'Malware Analysis',
+        icon: '🏠',
+        tags: ['URLs', 'Malicious', 'Tracking'],
+        url: 'https://urlhaus.abuse.ch/'
+    },
+    // Vulnerability Research
+    {
+        id: '21',
+        name: 'Exploit Database',
+        description: 'Archive of public exploits and corresponding vulnerable software',
+        category: 'Vulnerability Research',
+        icon: '💥',
+        tags: ['Exploits', 'CVE', 'Database'],
+        url: 'https://www.exploit-db.com/'
+    },
+    {
+        id: '22',
+        name: 'CVE Details',
+        description: 'Database of Common Vulnerabilities and Exposures',
+        category: 'Vulnerability Research',
+        icon: '📋',
+        tags: ['CVE', 'Vulnerabilities', 'Details'],
+        url: 'https://www.cvedetails.com/'
+    },
+    {
+        id: '23',
+        name: 'National Vulnerability Database',
+        description: 'NIST repository of standards-based vulnerability data',
+        category: 'Vulnerability Research',
+        icon: '🏛️',
+        tags: ['NIST', 'Official', 'Standards'],
+        url: 'https://nvd.nist.gov/'
+    },
+    {
+        id: '24',
+        name: 'Packet Storm',
+        description: 'Information security services, news, files, tools, exploits',
+        category: 'Vulnerability Research',
+        icon: '🌩️',
+        tags: ['Security', 'News', 'Tools'],
+        url: 'https://packetstormsecurity.com/'
+    },
+    {
+        id: '25',
+        name: 'Rapid7 DB',
+        description: 'Vulnerability and exploit database',
+        category: 'Vulnerability Research',
+        icon: '⚡',
+        tags: ['Rapid7', 'Database', 'Research'],
+        url: 'https://www.rapid7.com/db/'
+    },
+    // Privacy & Anonymity
+    {
+        id: '26',
+        name: '10 Minute Mail',
+        description: 'Temporary email address service',
+        category: 'Privacy & Anonymity',
+        icon: '📧',
+        tags: ['Temporary', 'Email', 'Privacy'],
+        url: 'https://10minutemail.com/'
+    },
+    {
+        id: '27',
+        name: 'Guerrilla Mail',
+        description: 'Disposable temporary email address',
+        category: 'Privacy & Anonymity',
+        icon: '⚔️',
+        tags: ['Disposable', 'Email', 'Anonymous'],
+        url: 'https://www.guerrillamail.com/'
+    },
+    {
+        id: '28',
+        name: 'ProtonMail',
+        description: 'Secure email service with end-to-end encryption',
+        category: 'Privacy & Anonymity',
+        icon: '🔐',
+        tags: ['Secure', 'Encrypted', 'Email'],
+        url: 'https://proton.me/mail'
+    },
+    {
+        id: '29',
+        name: 'Tor Browser',
+        description: 'Anonymous web browsing through Tor network',
+        category: 'Privacy & Anonymity',
+        icon: '🧅',
+        tags: ['Tor', 'Anonymous', 'Browser'],
+        url: 'https://www.torproject.org/'
+    },
+    {
+        id: '30',
+        name: 'DuckDuckGo',
+        description: 'Privacy-focused search engine',
+        category: 'Privacy & Anonymity',
+        icon: '🦆',
+        tags: ['Search', 'Privacy', 'Anonymous'],
+        url: 'https://duckduckgo.com/'
+    },
+    // Forensics & Analysis
+    {
+        id: '31',
+        name: 'EXIF Viewer',
+        description: 'View and analyze EXIF data from images',
+        category: 'Forensics & Analysis',
+        icon: '📷',
+        tags: ['EXIF', 'Metadata', 'Images'],
+        url: 'http://exif-viewer.com/'
+    },
+    {
+        id: '32',
+        name: 'Forensically',
+        description: 'Free online photo forensics tools',
+        category: 'Forensics & Analysis',
+        icon: '🔍',
+        tags: ['Photo', 'Forensics', 'Analysis'],
+        url: 'https://29a.ch/photo-forensics/'
+    },
+    {
+        id: '33',
+        name: 'FotoForensics',
+        description: 'Digital image forensics and analysis',
+        category: 'Forensics & Analysis',
+        icon: '📸',
+        tags: ['Digital', 'Forensics', 'Images'],
+        url: 'https://fotoforensics.com/'
+    },
+    {
+        id: '34',
+        name: 'Autopsy',
+        description: 'Digital forensics platform and graphical interface',
+        category: 'Forensics & Analysis',
+        icon: '🔬',
+        tags: ['Digital', 'Platform', 'GUI'],
+        url: 'https://www.autopsy.com/'
+    },
+    {
+        id: '35',
+        name: 'The Sleuth Kit',
+        description: 'Collection of command line digital forensics tools',
+        category: 'Forensics & Analysis',
+        icon: '🕵️',
+        tags: ['Command', 'Tools', 'Forensics'],
+        url: 'https://www.sleuthkit.org/'
+    },
+    {
+        id: '36',
+        name: 'Volatility',
+        description: 'Advanced memory forensics framework',
+        category: 'Forensics & Analysis',
+        icon: '🧠',
+        tags: ['Memory', 'Framework', 'Analysis'],
+        url: 'https://www.volatilityfoundation.org/'
+    },
+    // Social Engineering
+    {
+        id: '37',
+        name: 'PhishTank',
+        description: 'Community site for identifying and sharing phishing websites',
+        category: 'Social Engineering',
+        icon: '🎣',
+        tags: ['Phishing', 'Community', 'Database'],
+        url: 'https://www.phishtank.com/'
+    },
+    {
+        id: '38',
+        name: 'Anti-Phishing Working Group',
+        description: 'Global coalition focused on eliminating fraud and phishing',
+        category: 'Social Engineering',
+        icon: '🛡️',
+        tags: ['Anti-phishing', 'Coalition', 'Research'],
+        url: 'https://apwg.org/'
+    },
+    {
+        id: '39',
+        name: 'Social Engineer Toolkit',
+        description: 'Open-source penetration testing framework for social engineering',
+        category: 'Social Engineering',
+        icon: '🎭',
+        tags: ['SET', 'Framework', 'Testing'],
+        url: 'https://github.com/trustedsec/social-engineer-toolkit'
+    },
+    {
+        id: '40',
+        name: 'Gophish',
+        description: 'Open-source phishing simulation framework',
+        category: 'Social Engineering',
+        icon: '🐟',
+        tags: ['Simulation', 'Framework', 'Training'],
+        url: 'https://getgophish.com/'
+    },
+    {
+        id: '41',
+        name: 'King Phisher',
+        description: 'Tool for testing and promoting user awareness',
+        category: 'Social Engineering',
+        icon: '👑',
+        tags: ['Testing', 'Awareness', 'Training'],
+        url: 'https://github.com/rsmusllp/king-phisher'
+    },
+    // Cryptography & Encoding
+    {
+        id: '42',
+        name: 'CyberChef',
+        description: 'Web app for encryption, encoding, compression and data analysis',
+        category: 'Cryptography & Encoding',
+        icon: '👨‍🍳',
+        tags: ['Encoding', 'Encryption', 'Analysis'],
+        url: 'https://gchq.github.io/CyberChef/'
+    },
+    {
+        id: '43',
+        name: 'Base64 Decode',
+        description: 'Online Base64 encoder and decoder',
+        category: 'Cryptography & Encoding',
+        icon: '🔤',
+        tags: ['Base64', 'Encoding', 'Decoding'],
+        url: 'https://www.base64decode.org/'
+    },
+    {
+        id: '44',
+        name: 'Hash Generator',
+        description: 'Generate MD5, SHA1, SHA256 and other hashes',
+        category: 'Cryptography & Encoding',
+        icon: '#️⃣',
+        tags: ['Hash', 'MD5', 'SHA'],
+        url: 'https://www.onlinemd5.com/'
+    },
+    {
+        id: '45',
+        name: 'Cryptii',
+        description: 'Web app for modular conversion, encoding and encryption',
+        category: 'Cryptography & Encoding',
+        icon: '🔐',
+        tags: ['Conversion', 'Modular', 'Encryption'],
+        url: 'https://cryptii.com/'
+    },
+    {
+        id: '46',
+        name: 'dCode',
+        description: 'Universal tool for solving codes, ciphers and cryptograms',
+        category: 'Cryptography & Encoding',
+        icon: '🔓',
+        tags: ['Codes', 'Ciphers', 'Solver'],
+        url: 'https://www.dcode.fr/'
+    },
+    {
+        id: '47',
+        name: 'Hashcat',
+        description: 'Advanced password recovery utility',
+        category: 'Cryptography & Encoding',
+        icon: '🐱',
+        tags: ['Password', 'Recovery', 'Cracking'],
+        url: 'https://hashcat.net/'
+    },
+    // Network Analysis
+    {
+        id: '48',
+        name: 'Wireshark',
+        description: 'Network protocol analyzer and packet capture tool',
+        category: 'Network Analysis',
+        icon: '🦈',
+        tags: ['Network', 'Protocol', 'Packet'],
+        url: 'https://www.wireshark.org/'
+    },
+    {
+        id: '49',
+        name: 'NetworkMiner',
+        description: 'Network forensic analysis tool for packet capture files',
+        category: 'Network Analysis',
+        icon: '⛏️',
+        tags: ['Forensic', 'PCAP', 'Analysis'],
+        url: 'https://www.netresec.com/?page=NetworkMiner'
+    },
+    {
+        id: '50',
+        name: 'Nmap',
+        description: 'Network discovery and security auditing utility',
+        category: 'Network Analysis',
+        icon: '🗺️',
+        tags: ['Discovery', 'Scanning', 'Auditing'],
+        url: 'https://nmap.org/'
+    },
+    {
+        id: '51',
+        name: 'Masscan',
+        description: 'Fast TCP port scanner',
+        category: 'Network Analysis',
+        icon: '🚀',
+        tags: ['Fast', 'Scanner', 'TCP'],
+        url: 'https://github.com/robertdavidgraham/masscan'
+    },
+    {
+        id: '52',
+        name: 'Angry IP Scanner',
+        description: 'Fast and friendly network scanner',
+        category: 'Network Analysis',
+        icon: '😠',
+        tags: ['IP', 'Scanner', 'Network'],
+        url: 'https://angryip.org/'
+    }
+];

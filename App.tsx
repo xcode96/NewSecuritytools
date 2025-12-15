@@ -1,0 +1,543 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { categoryInfo } from './data/tools';
+import { ToolCard } from './components/ToolCard';
+import ToolDetailModal from './components/ToolDetailModal';
+import AdminLoginModal from './components/AdminLoginModal';
+import AdminBar from './components/AdminBar';
+import ArticleEditorModal from './components/ArticleEditorModal';
+import LoadingScreen from './components/LoadingScreen';
+import { Sidebar } from './components/Sidebar';
+import CategoryManagerModal from './components/CategoryManagerModal';
+
+import AboutModal from './components/AboutModal';
+import UsefulLinksModal from './components/UsefulLinksModal';
+import BooksModal from './components/BooksModal';
+import PlatformsModal from './components/PlatformsModal';
+import CertificationsModal from './components/CertificationsModal';
+import DownloadsModal from './components/DownloadsModal';
+import FrameworksModal from './components/FrameworksModal';
+import BreachServicesModal from './components/BreachServicesModal';
+import YouTubersModal from './components/YouTubersModal';
+
+import type { Tool, GeneratedToolDetails, ToolFormData, SubArticle, CategoryInfo, UserProfile } from './types';
+import { TOOLS } from './data/constants';
+import { fetchTools, fetchCategories, addTool, updateTool, deleteTool, addCategory, updateCategory, deleteCategory } from './services/supabaseService';
+import { signInWithGoogle, signOut as authSignOut, getUserProfile, onAuthStateChange, getSession } from './services/authService';
+import { UserAuthButton } from './components/UserAuthButton';
+import { ToolSubmissionModal } from './components/ToolSubmissionModal';
+import Dock from './components/Dock';
+import {
+  AllCategoriesIcon,
+  FavoritesIcon,
+  UserIcon,
+  LinkIcon,
+  BookIcon,
+  GlobeIcon,
+  CertificateIcon,
+  DownloadIcon,
+  FrameworkIcon,
+  ShieldCheckIcon,
+  YoutubeIcon,
+  SunIcon,
+  MoonIcon,
+  GridIcon,
+  SearchIcon,
+  PlusIcon,
+  LoginIcon,
+  LogoutIcon,
+  MenuIcon
+} from './components/IconComponents';
+
+interface ArticleEditorState {
+  mode: 'add' | 'edit';
+  toolName: string;
+  articleIndex?: number;
+  articleData?: SubArticle;
+}
+
+type Theme = 'light' | 'dark';
+
+const App: React.FC = () => {
+
+  console.log('App component rendering...');
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const [editingTool, setEditingTool] = useState<Tool | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [aiCache, setAiCache] = useState<Map<string, GeneratedToolDetails>>(new Map());
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
+  const [showAdminLogin, setShowAdminLogin] = useState<boolean>(false);
+  const [articleEditorState, setArticleEditorState] = useState<ArticleEditorState | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+
+  // Theme State
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const storedTheme = window.localStorage.getItem('theme') as Theme;
+        if (storedTheme) return storedTheme;
+      } catch (e) {
+        console.warn("Failed to parse theme from localStorage", e);
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  });
+
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('favorites');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        console.warn("Failed to parse favorites from localStorage", e);
+        return [];
+      }
+    }
+    return [];
+  });
+  const [categories, setCategories] = useState<CategoryInfo[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('categories');
+        return saved ? JSON.parse(saved) : categoryInfo;
+      } catch (e) {
+        console.warn("Failed to parse categories from localStorage", e);
+        return categoryInfo;
+      }
+    }
+    return categoryInfo;
+  });
+
+  // Modals state
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Apply Theme Effect
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+
+  useEffect(() => {
+    const initAuth = async () => {
+      // Subscribe to changes
+      // onAuthStateChange returns subscription object directly
+      const subscription = onAuthStateChange((event, session) => {
+        setUserProfile(session?.user ? {
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.user_metadata.full_name,
+          avatar_url: session.user.user_metadata.avatar_url
+        } : null);
+      });
+
+      // Get initial session
+      const session = await getSession();
+      if (session?.user) {
+        setUserProfile({
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.user_metadata.full_name,
+          avatar_url: session.user.user_metadata.avatar_url
+        });
+      }
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
+    initAuth();
+  }, []);
+
+  const handleToolClick = (tool: Tool) => {
+    setSelectedTool(tool);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTool(null);
+  };
+
+  const handleAdminLogin = (status: boolean) => {
+    setIsAdminLoggedIn(status);
+    if (status) {
+      setShowAdminLogin(false);
+    }
+  };
+
+  const handleEditTool = (tool: Tool) => {
+    setEditingTool(tool);
+  };
+
+  const handleSaveTool = async (formData: ToolFormData) => {
+    try {
+      if (editingTool) {
+        // updateTool expects (originalName, fullToolObject)
+        // We need to ensure we pass the full object associated with the FormData
+        const mergedTool: Tool = { ...editingTool, ...formData };
+
+        const success = await updateTool(editingTool.name, mergedTool);
+        if (success) {
+          setTools(prev => prev.map(t => t.id === editingTool.id ? mergedTool : t));
+        }
+        setEditingTool(null);
+      } else {
+        // addTool expects Tool (but formData is ToolFormData). 
+        const newToolPayload: Tool = {
+          ...formData,
+          articles: [],
+          isHidden: false,
+        } as Tool;
+
+        const success = await addTool(newToolPayload);
+        if (success) {
+          // Re-fetch to be safe
+          const freshTools = await fetchTools();
+          setTools(freshTools);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to save tool:", error);
+      alert("Failed to save tool. See console for details.");
+    }
+  };
+
+  const handleDeleteTool = async (toolId: string) => {
+    // We need the name for the service
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool) return;
+
+    if (window.confirm(`Are you sure you want to delete ${tool.name}?`)) {
+      try {
+        const success = await deleteTool(tool.name);
+        if (success) {
+          setTools(prev => prev.filter(t => t.id !== toolId));
+          if (selectedTool?.id === toolId) {
+            setSelectedTool(null);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to delete tool:", error);
+        alert("Failed to delete tool. See console for details.");
+      }
+    }
+  };
+
+  const handleEditArticle = (mode: 'add' | 'edit', tool: Tool, articleIndex?: number) => {
+    let articleData: SubArticle | undefined;
+    if (mode === 'edit' && typeof articleIndex === 'number' && tool.articles) {
+      articleData = tool.articles[articleIndex];
+    }
+    setArticleEditorState({ mode, toolName: tool.name, articleIndex, articleData });
+    setSelectedTool(null);
+  };
+
+  const handleSaveArticle = async (toolName: string, articles: SubArticle[]) => {
+    const toolToUpdate = tools.find(t => t.name === toolName);
+    if (!toolToUpdate) return;
+
+    try {
+      const updatedToolObj: Tool = { ...toolToUpdate, articles };
+
+      const success = await updateTool(toolToUpdate.name, updatedToolObj);
+      if (success) {
+        setTools(prev => prev.map(t => t.id === toolToUpdate.id ? updatedToolObj : t));
+      }
+      setArticleEditorState(null);
+      setSelectedTool(updatedToolObj);
+
+    } catch (error) {
+      console.error("Failed to save article:", error);
+      alert("Failed to save article.");
+    }
+  };
+
+
+  const toggleFavorite = (toolName: string) => {
+    setFavorites(prev => {
+      const newFavorites = prev.includes(toolName)
+        ? prev.filter(f => f !== toolName)
+        : [...prev, toolName];
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+      return newFavorites;
+    });
+  };
+
+  const handleCacheUpdate = (toolName: string, details: GeneratedToolDetails) => {
+    setAiCache(prev => new Map(prev).set(toolName, details));
+  };
+
+  // Category Management Handlers
+  const handleAddCategory = async (name: string) => {
+    const newCategory = await addCategory({ name, color: '#64748b' } as CategoryInfo); // minimal
+    if (newCategory) {
+      const fresh = await fetchCategories();
+      setCategories(fresh);
+    }
+  };
+
+  const handleUpdateCategory = async (id: any, name: string) => { // ID type?
+    const cat = categories.find(c => c.id === id);
+    if (!cat) return;
+
+    const success = await updateCategory(cat.name, { ...cat, name });
+    if (success) {
+      setCategories(prev => prev.map(c => c.id === id ? { ...c, name } : c));
+    }
+  };
+
+  const handleDeleteCategory = async (id: any) => {
+    const cat = categories.find(c => c.id === id);
+    if (!cat) return;
+
+    const success = await deleteCategory(cat.name);
+    if (success) {
+      setCategories(prev => prev.filter(c => c.id !== id));
+      if (activeCategory === cat.name) setActiveCategory('All');
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [fetchedTools, fetchedCategories] = await Promise.all([
+          fetchTools(),
+          fetchCategories()
+        ]);
+        setTools(fetchedTools);
+        if (fetchedCategories.length > 0) {
+          setCategories(fetchedCategories);
+        }
+        setIsLoading(false);
+      } catch (err: any) {
+        console.error("Error loading data:", err);
+        setLoadingError(err.message || 'Failed to load data');
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+
+  const filteredTools = useMemo(() => {
+    let filtered = tools;
+
+    if (activeCategory === 'Favorites') {
+      filtered = filtered.filter(tool => favorites.includes(tool.name));
+    } else if (activeCategory !== 'All') {
+      filtered = filtered.filter(tool => tool.category === activeCategory);
+    }
+
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(tool =>
+        tool.name.toLowerCase().includes(lowerQuery) ||
+        tool.description.toLowerCase().includes(lowerQuery) ||
+        tool.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
+      );
+    }
+
+    return filtered;
+  }, [tools, activeCategory, searchQuery, favorites]);
+
+  // Dock items configuration
+  const dockItems = [
+    { icon: <MenuIcon className="w-6 h-6" />, label: 'Menu', onClick: () => setIsSidebarOpen(true) },
+    { icon: <AllCategoriesIcon className="w-6 h-6" />, label: 'Home', onClick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); setActiveCategory('All'); } },
+    { icon: <FavoritesIcon className="w-6 h-6" />, label: 'Favorites', onClick: () => setActiveCategory('Favorites') },
+    {
+      icon: theme === 'dark' ? <MoonIcon className="w-6 h-6" /> : <SunIcon className="w-6 h-6" />,
+      label: theme === 'dark' ? 'Light Mode' : 'Dark Mode',
+      onClick: toggleTheme
+    },
+    { icon: <UserIcon className="w-6 h-6" />, label: 'About', onClick: () => setActiveModal('about') },
+    { icon: <LinkIcon className="w-6 h-6" />, label: 'Links', onClick: () => setActiveModal('links') },
+    { icon: <BookIcon className="w-6 h-6" />, label: 'Books', onClick: () => setActiveModal('books') },
+    { icon: <GlobeIcon className="w-6 h-6" />, label: 'Platforms', onClick: () => setActiveModal('platforms') },
+    { icon: <CertificateIcon className="w-6 h-6" />, label: 'Certs', onClick: () => setActiveModal('certs') },
+    { icon: <DownloadIcon className="w-6 h-6" />, label: 'Downloads', onClick: () => setActiveModal('downloads') },
+    { icon: <FrameworkIcon className="w-6 h-6" />, label: 'Frameworks', onClick: () => setActiveModal('frameworks') },
+    { icon: <ShieldCheckIcon className="w-6 h-6" />, label: 'Breach', onClick: () => setActiveModal('breach') },
+    { icon: <YoutubeIcon className="w-6 h-6" />, label: 'YouTubers', onClick: () => setActiveModal('youtubers') },
+    ...(isAdminLoggedIn
+      ? [
+        { icon: <GridIcon className="w-6 h-6" />, label: 'Manage', onClick: () => setActiveModal('categoryManager') },
+        { icon: <LogoutIcon className="w-6 h-6" />, label: 'Sign Out', onClick: () => setIsAdminLoggedIn(false) }
+      ]
+      : [{ icon: <LoginIcon className="w-6 h-6" />, label: 'Admin', onClick: () => setShowAdminLogin(true) }]
+    )
+  ];
+
+  const handleArticleSaveWrapper = (newArticle: SubArticle) => {
+    if (!articleEditorState) return;
+
+    const tool = tools.find(t => t.name === articleEditorState.toolName);
+    if (!tool) return;
+
+    let updatedArticles = [...(tool.articles || [])];
+    if (articleEditorState.mode === 'edit' && typeof articleEditorState.articleIndex === 'number') {
+      updatedArticles[articleEditorState.articleIndex] = newArticle;
+    } else {
+      updatedArticles.push(newArticle);
+    }
+    handleSaveArticle(articleEditorState.toolName, updatedArticles);
+  };
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <div className={`min-h-screen flex flex-col transition-colors duration-300`}>
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        categories={categories}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+      />
+
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300">
+
+        <main className="flex-1 container mx-auto px-4 pb-32 pt-12">
+          {/* Tool Grid */}
+          {filteredTools.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredTools.map(tool => (
+                <div key={tool.id} className="h-[280px]"> {/* Fixed height container */}
+                  <ToolCard
+                    tool={tool}
+                    onClick={() => handleToolClick(tool)}
+                    isAdmin={isAdminLoggedIn}
+                    onEdit={() => handleEditTool(tool)}
+                    isFavorite={favorites.includes(tool.name)}
+                    onToggleFavorite={() => toggleFavorite(tool.name)}
+                    isHidden={tool.isHidden}
+                    onToggleVisibility={async () => {
+                      // Optimistic + Service call
+                      try {
+                        const updated = { ...tool, isHidden: !tool.isHidden };
+                        setTools(prev => prev.map(t => t.id === tool.id ? updated : t));
+
+                        // Pass full tool object to update
+                        await updateTool(tool.name, updated);
+                      } catch (e) { console.error(e); }
+                    }}
+                  />
+                </div>
+              ))}
+              {/* Add New Tool Card (Admin Only) */}
+              {isAdminLoggedIn && (
+                <button
+                  onClick={() => setEditingTool({
+                    id: '', name: '', category: 'Network Scanning & Analysis',
+                    description: '', url: '', color: '#3b82f6', command: '',
+                    tags: []
+                  } as Tool)}
+                  className="h-[280px] rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all gap-4 group"
+                >
+                  <div className="p-4 rounded-full bg-slate-100 dark:bg-white/5 group-hover:scale-110 transition-transform">
+                    <PlusIcon className="w-8 h-8" />
+                  </div>
+                  <span className="font-bold">Add New Tool</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
+                <SearchIcon className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">No tools found</h3>
+              <p className="text-slate-500 dark:text-slate-400">Try adjusting your search or category filter.</p>
+            </div>
+          )}
+
+        </main>
+
+        {/* Dock - Bottom Positioned */}
+        <div className="fixed bottom-6 z-40 flex justify-center w-full pointer-events-none transition-all duration-300">
+          <div className="pointer-events-auto">
+            <Dock items={dockItems} />
+          </div>
+        </div>
+      </div>
+
+      {/* All Modals */}
+      {selectedTool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div onClick={(e) => e.stopPropagation()} className="w-full h-full bg-white dark:bg-slate-900 overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <ToolDetailModal
+              tool={selectedTool}
+              onClose={handleCloseModal}
+              cache={aiCache}
+              onCacheUpdate={handleCacheUpdate}
+              isAdmin={isAdminLoggedIn}
+              onEditArticle={handleEditArticle}
+            />
+          </div>
+        </div>
+      )}
+
+      {showAdminLogin && (
+        <AdminLoginModal onClose={() => setShowAdminLogin(false)} onLogin={handleAdminLogin} />
+      )}
+
+      {editingTool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded">
+            <h2>Edit Tool (Placeholder)</h2>
+            <button onClick={() => setEditingTool(null)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {articleEditorState && (
+        <ArticleEditorModal
+          onClose={() => setArticleEditorState(null)}
+          article={articleEditorState.articleData || null}
+          onSave={handleArticleSaveWrapper}
+        />
+      )}
+
+      <UsefulLinksModal isOpen={activeModal === 'links'} onClose={() => setActiveModal(null)} />
+      <BooksModal isOpen={activeModal === 'books'} onClose={() => setActiveModal(null)} />
+      <PlatformsModal isOpen={activeModal === 'platforms'} onClose={() => setActiveModal(null)} />
+      <CertificationsModal isOpen={activeModal === 'certs'} onClose={() => setActiveModal(null)} />
+      <DownloadsModal isOpen={activeModal === 'downloads'} onClose={() => setActiveModal(null)} />
+      <FrameworksModal isOpen={activeModal === 'frameworks'} onClose={() => setActiveModal(null)} />
+      <BreachServicesModal isOpen={activeModal === 'breach'} onClose={() => setActiveModal(null)} />
+      <YouTubersModal isOpen={activeModal === 'youtubers'} onClose={() => setActiveModal(null)} />
+      <CategoryManagerModal isOpen={activeModal === 'categoryManager'} onClose={() => setActiveModal(null)} categories={categories} onAdd={handleAddCategory} onUpdate={handleUpdateCategory} onDelete={handleDeleteCategory} />
+
+      {activeModal === 'submission' && (
+        <ToolSubmissionModal
+          categories={categories}
+          onSuccess={() => {
+            setActiveModal(null);
+            alert("Tool submitted for review!");
+          }}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+    </div>
+  );
+};
+
+export default App;

@@ -1,0 +1,173 @@
+export type BookCategory = 'Red Team' | 'Blue Team' | 'General';
+
+export interface Book {
+    id: string;
+    title: string;
+    author: string;
+    description: string;
+    year: string;
+    pages: string;
+    category: BookCategory;
+    tags: string[];
+    amazonLink: string;
+    rating: number;
+}
+
+export const booksData: Book[] = [
+    {
+        id: '1',
+        title: "The Hacker Playbook 3: Practical Guide To Penetration Testing",
+        author: "Peter Kim",
+        description: "Advanced penetration testing techniques and methodologies used by professional red teams.",
+        year: "2018",
+        pages: "289 pages",
+        category: "Red Team",
+        tags: ["Penetration Testing", "Practical", "Advanced"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '2',
+        title: "Red Team Field Manual",
+        author: "Ben Clark",
+        description: "A comprehensive reference guide for red team operations, penetration testing, and security assessments.",
+        year: "2014",
+        pages: "96 pages",
+        category: "Red Team",
+        tags: ["Reference", "Field Manual", "Quick Reference"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '3',
+        title: "Advanced Penetration Testing: Hacking the World's Most Secure Networks",
+        author: "Wil Allsopp",
+        description: "Advanced techniques for penetrating highly secured networks and systems.",
+        year: "2017",
+        pages: "288 pages",
+        category: "Red Team",
+        tags: ["Advanced", "Network Security", "Professional"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '4',
+        title: "Social Engineering: The Art of Human Hacking",
+        author: "Christopher Hadnagy",
+        description: "Comprehensive guide to social engineering techniques and psychological manipulation.",
+        year: "2010",
+        pages: "410 pages",
+        category: "Red Team",
+        tags: ["Social Engineering", "Psychology", "Human Factor"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '5',
+        title: "Metasploit: The Penetration Tester's Guide",
+        author: "David Kennedy, Jim O'Gorman",
+        description: "Complete guide to using Metasploit framework for penetration testing and exploitation.",
+        year: "2011",
+        pages: "328 pages",
+        category: "Red Team",
+        tags: ["Metasploit", "Exploitation", "Framework"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '6',
+        title: "Blue Team Field Manual (BTFM)",
+        author: "Alan J White, Ben Clark",
+        description: "Essential reference for incident response, digital forensics, and security operations.",
+        year: "2017",
+        pages: "134 pages",
+        category: "Blue Team",
+        tags: ["Incident Response", "Reference", "SOC"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '7',
+        title: "The Practice of Network Security",
+        author: "Richard Bejtlich",
+        description: "Comprehensive guide to network security monitoring, analysis, and incident response.",
+        year: "2013",
+        pages: "376 pages",
+        category: "Blue Team",
+        tags: ["Network Monitoring", "Analysis", "NSM"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '8',
+        title: "IR & Computer Forensics",
+        author: "Jason T. Luttgens, Matthew Pepe",
+        description: "Complete guide to incident response procedures and digital forensics techniques.",
+        year: "2014",
+        pages: "544 pages",
+        category: "Blue Team",
+        tags: ["Incident Response", "Digital Forensics", "Investigation"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '9',
+        title: "Applied Network Security Monitoring",
+        author: "Chris Sanders, Jason Smith",
+        description: "Practical approach to network security monitoring and threat detection.",
+        year: "2013",
+        pages: "496 pages",
+        category: "Blue Team",
+        tags: ["Network Security", "Monitoring", "Threat Detection"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '10',
+        title: "The Art of Memory Forensics",
+        author: "Michael Hale Ligh, Andrew Case, Jamie Levy, AAron Walters",
+        description: "Advanced techniques for memory analysis and digital forensics investigations.",
+        year: "2014",
+        pages: "912 pages",
+        category: "Blue Team",
+        tags: ["Memory Forensics", "Digital Forensics", "Advanced"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '11',
+        title: "Security Operations Center",
+        author: "Joseph Muniz, Gary McIntyre, Nadhem AlFardan",
+        description: "Complete guide to building and operating a Security Operations Center.",
+        year: "2015",
+        pages: "464 pages",
+        category: "Blue Team",
+        tags: ["SOC", "Operations", "Management"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '12',
+        title: "The Web Application Hacker's Handbook",
+        author: "Dafydd Stuttard, Marcus Pinto",
+        description: "Comprehensive guide to finding and exploiting security flaws in web applications.",
+        year: "2011",
+        pages: "912 pages",
+        category: "General",
+        tags: ["Web Security", "Application Security", "Hacking"],
+        amazonLink: "#",
+        rating: 5
+    },
+    {
+        id: '13',
+        title: "Practical Malware Analysis",
+        author: "Michael Sikorski, Andrew Honig",
+        description: "Hands-on guide to malware analysis and reverse engineering techniques.",
+        year: "2012",
+        pages: "800 pages",
+        category: "General",
+        tags: ["Malware Analysis", "Reverse Engineering", "Practical"],
+        amazonLink: "#",
+        rating: 5
+    }
+];

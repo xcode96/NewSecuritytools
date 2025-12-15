@@ -1,0 +1,434 @@
+export type FrameworkCategory =
+    | 'Risk Management & Governance'
+    | 'Industry-Specific Compliance'
+    | 'Security Controls & Benchmarks'
+    | 'Threat Intelligence & Attack Frameworks'
+    | 'Penetration Testing & Assessment'
+    | 'Application Security'
+    | 'Cloud Security'
+    | 'Incident Response & Forensics';
+
+export interface Framework {
+    id: string;
+    name: string;
+    code: string;
+    organization: string;
+    description: string;
+    scope: string;
+    industry: string;
+    compliance: string;
+    category: FrameworkCategory;
+    keyComponents: string[];
+    benefits: string[];
+    commonUseCases: string[];
+    availableCertifications: string[];
+    adoption: number; // Percentage
+    link: string;
+}
+
+export const frameworksData: Framework[] = [
+    // Risk Management & Governance
+    {
+        id: '1',
+        name: 'NIST Cybersecurity Framework',
+        code: 'NIST CSF',
+        organization: 'National Institute of Standards and Technology',
+        description: 'Comprehensive framework for managing cybersecurity risk across organizations of all sizes.',
+        scope: 'Enterprise-wide cybersecurity risk management',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Risk Management & Governance',
+        keyComponents: ['Identify', 'Protect', 'Detect', 'Respond', 'Recover', 'Govern'],
+        benefits: ['Risk reduction', 'Improved communication', 'Regulatory alignment', 'Cost-effective'],
+        commonUseCases: ['Risk assessment', 'Security program development', 'Incident response planning'],
+        availableCertifications: ['NIST CSF Practitioner', 'NIST CSF Professional'],
+        adoption: 95,
+        link: 'https://www.nist.gov/cybersecurity-framework'
+    },
+    {
+        id: '2',
+        name: 'ISO/IEC 27001',
+        code: 'ISO 27001',
+        organization: 'International Organization for Standardization',
+        description: 'International standard for information security management systems (ISMS).',
+        scope: 'Information Security Management System',
+        industry: 'All Industries',
+        compliance: 'Certification',
+        category: 'Risk Management & Governance',
+        keyComponents: ['ISMS', 'Risk Management', 'Controls', 'Continuous Improvement'],
+        benefits: ['Global recognition', 'Legal compliance', 'Customer trust', 'Risk management'],
+        commonUseCases: ['ISMS implementation', 'Compliance demonstration', 'Third-party assurance'],
+        availableCertifications: ['ISO 27001 Lead Implementer', 'ISO 27001 Lead Auditor'],
+        adoption: 88,
+        link: 'https://www.iso.org/standard/27001'
+    },
+    {
+        id: '3',
+        name: 'COSO Enterprise Risk Management',
+        code: 'COSO ERM',
+        organization: 'Committee of Sponsoring Organizations',
+        description: 'Framework for enterprise risk management across all business functions.',
+        scope: 'Enterprise Risk Management',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Risk Management & Governance',
+        keyComponents: ['Governance', 'Strategy', 'Performance', 'Review', 'Information'],
+        benefits: ['Strategic alignment', 'Risk-informed decisions', 'Performance improvement'],
+        commonUseCases: ['Enterprise risk assessment', 'Strategic planning', 'Board reporting'],
+        availableCertifications: ['COSO ERM Certificate'],
+        adoption: 75,
+        link: 'https://www.coso.org/site/erm'
+    },
+    // Industry-Specific Compliance
+    {
+        id: '4',
+        name: 'Payment Card Industry Data Security Standard',
+        code: 'PCI DSS',
+        organization: 'PCI Security Standards Council',
+        description: 'Security standard for organizations that handle credit card information.',
+        scope: 'Payment Card Data Protection',
+        industry: 'Financial Services, Retail',
+        compliance: 'Mandatory',
+        category: 'Industry-Specific Compliance',
+        keyComponents: ['Network Security', 'Data Protection', 'Vulnerability Management', 'Access Control', 'Monitoring', 'Policy'],
+        benefits: ['Reduced fraud', 'Customer trust', 'Regulatory compliance', 'Brand protection'],
+        commonUseCases: ['Payment processing', 'E-commerce', 'Point-of-sale systems'],
+        availableCertifications: ['PCI DSS QSA', 'PCI DSS ISA', 'PCI DSS ASV'],
+        adoption: 92,
+        link: 'https://www.pcisecuritystandards.org/'
+    },
+    {
+        id: '5',
+        name: 'Health Insurance Portability and Accountability Act',
+        code: 'HIPAA',
+        organization: 'U.S. Department of Health and Human Services',
+        description: 'Federal law protecting sensitive patient health information.',
+        scope: 'Healthcare Data Protection',
+        industry: 'Healthcare',
+        compliance: 'Mandatory',
+        category: 'Industry-Specific Compliance',
+        keyComponents: ['Privacy Rule', 'Security Rule', 'Breach Notification', 'Enforcement'],
+        benefits: ['Patient privacy', 'Legal compliance', 'Trust building', 'Risk reduction'],
+        commonUseCases: ['Healthcare providers', 'Health plans', 'Healthcare clearinghouses'],
+        availableCertifications: ['HIPAA Compliance Officer', 'HIPAA Security Officer'],
+        adoption: 98,
+        link: 'https://www.hhs.gov/hipaa/'
+    },
+    {
+        id: '6',
+        name: 'Federal Risk and Authorization Management Program',
+        code: 'FedRAMP',
+        organization: 'U.S. General Services Administration',
+        description: 'Government-wide program for cloud security assessment and authorization.',
+        scope: 'Cloud Security for Government',
+        industry: 'Government, Cloud Providers',
+        compliance: 'Mandatory',
+        category: 'Industry-Specific Compliance',
+        keyComponents: ['Security Controls', 'Assessment', 'Authorization', 'Continuous Monitoring'],
+        benefits: ['Government market access', 'Security standardization', 'Cost savings'],
+        commonUseCases: ['Cloud service providers', 'Government agencies', 'Federal contractors'],
+        availableCertifications: ['FedRAMP 3PAO', 'FedRAMP PMO'],
+        adoption: 85,
+        link: 'https://www.fedramp.gov/'
+    },
+    {
+        id: '7',
+        name: 'HITRUST Common Security Framework',
+        code: 'HITRUST CSF',
+        organization: 'HITRUST Alliance',
+        description: 'Comprehensive security framework for healthcare and other regulated industries.',
+        scope: 'Healthcare and Regulated Industries',
+        industry: 'Healthcare, Financial Services',
+        compliance: 'Certification',
+        category: 'Industry-Specific Compliance',
+        keyComponents: ['Risk-based approach', 'Scalable controls', 'Assessment methodology'],
+        benefits: ['Regulatory alignment', 'Third-party assurance', 'Risk reduction'],
+        commonUseCases: ['Healthcare organizations', 'Business associates', 'Cloud providers'],
+        availableCertifications: ['HITRUST CSF Practitioner', 'HITRUST CSF Assessor'],
+        adoption: 80,
+        link: 'https://hitrustalliance.net/'
+    },
+    // Security Controls & Benchmarks
+    {
+        id: '8',
+        name: 'Center for Internet Security Controls',
+        code: 'CIS Controls',
+        organization: 'Center for Internet Security',
+        description: 'Prioritized set of actions for cyber defense that provide specific ways to stop attacks.',
+        scope: 'Cyber Defense Controls',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Security Controls & Benchmarks',
+        keyComponents: ['18 Critical Security Controls', 'Implementation Groups', 'Safeguards'],
+        benefits: ['Attack prevention', 'Prioritized approach', 'Measurable security'],
+        commonUseCases: ['Security program development', 'Risk assessment', 'Compliance mapping'],
+        availableCertifications: ['CIS Controls Assessment'],
+        adoption: 82,
+        link: 'https://www.cisecurity.org/controls'
+    },
+    // Threat Intelligence & Attack Frameworks
+    {
+        id: '9',
+        name: 'MITRE ATT&CK Framework',
+        code: 'ATT&CK',
+        organization: 'MITRE Corporation',
+        description: 'Knowledge base of adversary tactics, techniques, and procedures (TTPs).',
+        scope: 'Threat Intelligence and Defense',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Threat Intelligence & Attack Frameworks',
+        keyComponents: ['Tactics', 'Techniques', 'Procedures', 'Mitigations', 'Groups'],
+        benefits: ['Threat understanding', 'Defense planning', 'Security tool evaluation'],
+        commonUseCases: ['Threat hunting', 'Red teaming', 'Security operations', 'Tool evaluation'],
+        availableCertifications: ['MITRE ATT&CK Defender'],
+        adoption: 90,
+        link: 'https://attack.mitre.org/'
+    },
+    {
+        id: '10',
+        name: 'Cyber Kill Chain',
+        code: 'CKC',
+        organization: 'Lockheed Martin',
+        description: 'Framework for understanding and stopping cyber attacks.',
+        scope: 'Attack Lifecycle Analysis',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Threat Intelligence & Attack Frameworks',
+        keyComponents: ['Reconnaissance', 'Weaponization', 'Delivery', 'Exploitation', 'Installation', 'C2', 'Actions'],
+        benefits: ['Attack understanding', 'Defense planning', 'Incident analysis'],
+        commonUseCases: ['Threat analysis', 'Incident response', 'Security awareness'],
+        availableCertifications: ['Cyber Kill Chain Analyst'],
+        adoption: 88,
+        link: 'https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html'
+    },
+    // Penetration Testing & Assessment
+    {
+        id: '11',
+        name: 'Penetration Testing Execution Standard',
+        code: 'PTES',
+        organization: 'PTES Community',
+        description: 'Standard for conducting penetration testing with consistent methodology.',
+        scope: 'Penetration Testing Methodology',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Penetration Testing & Assessment',
+        keyComponents: ['Pre-engagement', 'Intelligence Gathering', 'Threat Modeling', 'Vulnerability Analysis', 'Exploitation', 'Post Exploitation', 'Reporting'],
+        benefits: ['Standardized testing', 'Comprehensive coverage', 'Consistent results'],
+        commonUseCases: ['Penetration testing', 'Security assessments', 'Red team exercises'],
+        availableCertifications: ['PTES Certified Tester'],
+        adoption: 75,
+        link: 'http://www.pentest-standard.org/'
+    },
+    {
+        id: '12',
+        name: 'Open Source Security Testing Methodology Manual',
+        code: 'OSSTMM',
+        organization: 'ISECOM',
+        description: 'Methodology for security testing and analysis.',
+        scope: 'Security Testing Methodology',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Penetration Testing & Assessment',
+        keyComponents: ['Security Analysis', 'Operational Security', 'Trust Analysis'],
+        benefits: ['Scientific approach', 'Repeatable results', 'Quantifiable security'],
+        commonUseCases: ['Security testing', 'Risk analysis', 'Compliance validation'],
+        availableCertifications: ['OSSTMM Professional Security Tester'],
+        adoption: 70,
+        link: 'https://www.isecom.org/research.html'
+    },
+    {
+        id: '13',
+        name: 'NIST Special Publication 800-115',
+        code: 'NIST SP 800-115',
+        organization: 'National Institute of Standards and Technology',
+        description: 'Technical guide to information security testing and assessment.',
+        scope: 'Security Testing and Assessment',
+        industry: 'Government, Federal Contractors',
+        compliance: 'Recommended for Federal',
+        category: 'Penetration Testing & Assessment',
+        keyComponents: ['Planning', 'Discovery', 'Vulnerability Assessment', 'Penetration Testing'],
+        benefits: ['Government alignment', 'Structured approach', 'Risk-based testing'],
+        commonUseCases: ['Federal assessments', 'Compliance testing', 'Security validation'],
+        availableCertifications: ['NIST Assessment Professional'],
+        adoption: 80,
+        link: 'https://csrc.nist.gov/publications/detail/sp/800-115/final'
+    },
+    // Application Security
+    {
+        id: '14',
+        name: 'Open Web Application Security Project',
+        code: 'OWASP',
+        organization: 'OWASP Foundation',
+        description: 'Community-driven organization focused on improving software security.',
+        scope: 'Application Security',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Application Security',
+        keyComponents: ['Top 10', 'ASVS', 'SAMM', 'Testing Guide', 'Code Review Guide'],
+        benefits: ['Security awareness', 'Best practices', 'Community support'],
+        commonUseCases: ['Secure development', 'Security testing', 'Risk assessment'],
+        availableCertifications: ['OWASP Certified Professional'],
+        adoption: 95,
+        link: 'https://owasp.org/'
+    },
+    {
+        id: '15',
+        name: 'Software Assurance Maturity Model',
+        code: 'SAMM',
+        organization: 'OWASP Foundation',
+        description: 'Framework for measuring and improving software security practices.',
+        scope: 'Software Security Maturity',
+        industry: 'Software Development',
+        compliance: 'Voluntary',
+        category: 'Application Security',
+        keyComponents: ['Governance', 'Design', 'Implementation', 'Verification', 'Operations'],
+        benefits: ['Maturity assessment', 'Roadmap planning', 'Risk reduction'],
+        commonUseCases: ['Security program assessment', 'Improvement planning', 'Benchmarking'],
+        availableCertifications: ['SAMM Assessor'],
+        adoption: 70,
+        link: 'https://owaspsamm.org/'
+    },
+    {
+        id: '16',
+        name: 'Building Security In Maturity Model',
+        code: 'BSIMM',
+        organization: 'Synopsys',
+        description: 'Study of existing software security initiatives to provide a measuring stick.',
+        scope: 'Software Security Initiative Measurement',
+        industry: 'Software Development',
+        compliance: 'Voluntary',
+        category: 'Application Security',
+        keyComponents: ['Governance', 'Intelligence', 'SSDL Touchpoints', 'Deployment'],
+        benefits: ['Benchmarking', 'Best practice identification', 'Program planning'],
+        commonUseCases: ['Security program benchmarking', 'Maturity assessment', 'Strategy development'],
+        availableCertifications: ['BSIMM Assessor'],
+        adoption: 65,
+        link: 'https://www.bsimm.com/'
+    },
+    // Cloud Security
+    {
+        id: '17',
+        name: 'Cloud Security Alliance Cloud Controls Matrix',
+        code: 'CSA CCM',
+        organization: 'Cloud Security Alliance',
+        description: 'Cybersecurity control framework specifically designed for cloud computing.',
+        scope: 'Cloud Security Controls',
+        industry: 'Cloud Computing',
+        compliance: 'Voluntary',
+        category: 'Cloud Security',
+        keyComponents: ['Control Domains', 'Control Specifications', 'Mappings'],
+        benefits: ['Cloud-specific controls', 'Compliance mapping', 'Risk reduction'],
+        commonUseCases: ['Cloud security assessment', 'Vendor evaluation', 'Compliance demonstration'],
+        availableCertifications: ['CSA CCSK', 'CSA CCSP'],
+        adoption: 85,
+        link: 'https://cloudsecurityalliance.org/research/artifacts/cloud-controls-matrix/'
+    },
+    {
+        id: '18',
+        name: 'Service Organization Control 2',
+        code: 'SOC 2',
+        organization: 'American Institute of CPAs',
+        description: 'Auditing standard for service organizations storing customer data in the cloud.',
+        scope: 'Service Organization Controls',
+        industry: 'Service Providers, Cloud',
+        compliance: 'Audit Standard',
+        category: 'Cloud Security',
+        keyComponents: ['Security', 'Availability', 'Processing Integrity', 'Confidentiality', 'Privacy'],
+        benefits: ['Customer assurance', 'Competitive advantage', 'Risk management'],
+        commonUseCases: ['Service provider audits', 'Customer due diligence', 'Compliance demonstration'],
+        availableCertifications: ['SOC 2 Auditor'],
+        adoption: 88,
+        link: 'https://www.aicpa.org/interestareas/frc/assuranceadvisoryservices/aicpa-soc-2-report.html'
+    },
+    // Incident Response & Forensics
+    {
+        id: '19',
+        name: 'NIST Computer Security Incident Handling Guide',
+        code: 'NIST SP 800-61',
+        organization: 'National Institute of Standards and Technology',
+        description: 'Guidelines for incident handling, particularly for analyzing incident-related data.',
+        scope: 'Incident Response',
+        industry: 'All Industries',
+        compliance: 'Recommended',
+        category: 'Incident Response & Forensics',
+        keyComponents: ['Preparation', 'Detection & Analysis', 'Containment, Eradication & Recovery', 'Post-Incident Activity'],
+        benefits: ['Structured response', 'Improved recovery', 'Lessons learned'],
+        commonUseCases: ['Incident response planning', 'Team training', 'Process improvement'],
+        availableCertifications: ['NIST Incident Handler'],
+        adoption: 90,
+        link: 'https://csrc.nist.gov/publications/detail/sp/800-61/rev2/final'
+    },
+    {
+        id: '20',
+        name: 'SANS Incident Response Process',
+        code: 'SANS IRP',
+        organization: 'SANS Institute',
+        description: 'Six-step incident response process for handling security incidents.',
+        scope: 'Incident Response Process',
+        industry: 'All Industries',
+        compliance: 'Voluntary',
+        category: 'Incident Response & Forensics',
+        keyComponents: ['Preparation', 'Identification', 'Containment', 'Eradication', 'Recovery', 'Lessons Learned'],
+        benefits: ['Clear process', 'Effective response', 'Continuous improvement'],
+        commonUseCases: ['Incident response', 'Team training', 'Process development'],
+        availableCertifications: ['GCIH', 'GCFA', 'GNFA'],
+        adoption: 85,
+        link: 'https://www.sans.org/incident-response/'
+    },
+];
+
+export const frameworkStats = {
+    total: 20,
+    categories: 8,
+    mature: '78%',
+    mostAdopted: [
+        { name: 'HIPAA', adoption: 98 },
+        { name: 'NIST CSF', adoption: 95 },
+        { name: 'OWASP', adoption: 95 },
+        { name: 'PCI DSS', adoption: 92 }
+    ]
+};
+
+export const comparisonMatrix = [
+    { framework: 'NIST CSF', industry: 'All Industries', complexity: 'Medium', cost: 'Free', adoption: '95%', maturity: 'Mature' },
+    { framework: 'ISO 27001', industry: 'All Industries', complexity: 'High', cost: 'Paid', adoption: '88%', maturity: 'Mature' },
+    { framework: 'MITRE ATT&CK', industry: 'All Industries', complexity: 'High', cost: 'Free', adoption: '90%', maturity: 'Mature' },
+    { framework: 'PCI DSS', industry: 'Financial/Retail', complexity: 'High', cost: 'Compliance', adoption: '92%', maturity: 'Mature' },
+    { framework: 'CIS Controls', industry: 'All Industries', complexity: 'Medium', cost: 'Free', adoption: '82%', maturity: 'Mature' },
+    { framework: 'OWASP', industry: 'Software Dev', complexity: 'Medium', cost: 'Free', adoption: '95%', maturity: 'Mature' },
+];
+
+export const bestPractices = [
+    { title: 'Start with Assessment', desc: 'Begin with a current state assessment to understand gaps and priorities.' },
+    { title: 'Phased Approach', desc: 'Implement frameworks in phases, starting with high-priority areas.' },
+    { title: 'Executive Support', desc: 'Ensure strong leadership support and adequate resource allocation.' },
+    { title: 'Training & Awareness', desc: 'Invest in training staff on framework requirements and implementation.' },
+    { title: 'Continuous Monitoring', desc: 'Establish ongoing monitoring and measurement processes for effectiveness.' },
+    { title: 'Regular Updates', desc: 'Keep frameworks current with evolving threats and business requirements.' },
+];
+
+export const selectionGuide = {
+    beginners: [
+        { name: 'NIST CSF', desc: 'Start here for overall security program' },
+        { name: 'CIS Controls', desc: 'Practical, prioritized security measures' },
+        { name: 'OWASP Top 10', desc: 'Essential for application security' },
+    ],
+    compliance: [
+        { name: 'ISO 27001', desc: 'International certification standard' },
+        { name: 'PCI DSS', desc: 'Payment card industry requirements' },
+        { name: 'HIPAA', desc: 'Healthcare data protection' },
+        { name: 'FedRAMP', desc: 'Government cloud services' },
+    ],
+    advanced: [
+        { name: 'MITRE ATT&CK', desc: 'Threat intelligence and hunting' },
+        { name: 'PTES', desc: 'Advanced penetration testing' },
+        { name: 'SAMM', desc: 'Software security maturity' },
+        { name: 'NIST SP 800-53', desc: 'Comprehensive controls' },
+    ]
+};
+
+export const latestUpdates = [
+    { name: 'NIST Cybersecurity Framework 2.0', date: 'Feb 2024', desc: 'Released February 2024 with enhanced governance function and supply chain focus.' },
+    { name: 'MITRE ATT&CK v14', date: 'Oct 2023', desc: 'Latest version includes new techniques for cloud environments and mobile platforms.' },
+    { name: 'PCI DSS v4.0', date: 'Mar 2022', desc: 'Major update with new requirements for authentication and encryption.' },
+];
