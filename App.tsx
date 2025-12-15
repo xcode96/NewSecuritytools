@@ -203,7 +203,7 @@ const App: React.FC = () => {
     // updateTool expects (originalName, fullToolObject)
     // We need to ensure we pass the full object associated with the FormData
     // Static mode: Just update state
-    if (editingTool) {
+    if (editingTool && editingTool.id) {
       const mergedTool: Tool = { ...editingTool, ...formData };
       setTools(prev => prev.map(t => t.id === editingTool.id ? mergedTool : t));
       setEditingTool(null);
@@ -212,9 +212,15 @@ const App: React.FC = () => {
         ...formData,
         articles: [],
         isHidden: false,
-        id: Date.now().toString() // Generate ID for static add
+        id: crypto.randomUUID()
       } as Tool;
+      console.log("Creating new tool:", newToolPayload);
       setTools(prev => [...prev, newToolPayload]);
+      if (activeCategory !== 'All' && activeCategory !== newToolPayload.category) {
+        setActiveCategory('All');
+      }
+      setSearchQuery(''); // Ensure tool is visible if filters are active
+      setEditingTool(null);
     }
   };
 
@@ -275,21 +281,36 @@ const App: React.FC = () => {
   };
 
   // Category Management Handlers
-  const handleAddCategory = async (name: string) => {
-    // Static: just update state
-    const newCategory: CategoryInfo = { name, color: '#64748b' };
-    setCategories(prev => [...prev, newCategory]);
+  // Category Management Handlers
+  const handleAddCategory = async (category: CategoryInfo) => {
+    // Check if category already exists to avoid duplicates (though modal checks too)
+    setCategories(prev => {
+      if (prev.some(c => c.name === category.name)) return prev;
+      return [...prev, category];
+    });
   };
 
-  const handleUpdateCategory = async (id: any, name: string) => { // ID type?
-    // For static, ID might not exist well, assume name match or whatever logic
-    // Actually categories state is used
-    setCategories(prev => prev.map(c => c.id === id ? { ...c, name } : c));
+  const handleUpdateCategory = async (originalName: string, updatedCategory: CategoryInfo) => {
+    setCategories(prev => prev.map(c => c.name === originalName ? updatedCategory : c));
+
+    // Also update tools that were in this category
+    setTools(prev => prev.map(t => {
+      if (t.category === originalName) {
+        return { ...t, category: updatedCategory.name };
+      }
+      return t;
+    }));
+
+    if (activeCategory === originalName) {
+      setActiveCategory(updatedCategory.name);
+    }
   };
 
-  const handleDeleteCategory = async (id: any) => {
-    setCategories(prev => prev.filter(c => c.id !== id));
-    // if (activeCategory === cat.name) setActiveCategory('All'); // logic needed
+  const handleDeleteCategory = async (categoryName: string) => {
+    setCategories(prev => prev.filter(c => c.name !== categoryName));
+    if (activeCategory === categoryName) {
+      setActiveCategory('All');
+    }
   };
 
   // No loadData effect needed for static
@@ -460,6 +481,7 @@ const App: React.FC = () => {
 
       {editingTool && (
         <ToolFormModal
+          key={editingTool.id || 'new-tool'}
           tool={editingTool.id ? editingTool : null}
           categories={categories}
           onClose={() => setEditingTool(null)}
@@ -483,7 +505,7 @@ const App: React.FC = () => {
       <FrameworksModal isOpen={activeModal === 'frameworks'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <BreachServicesModal isOpen={activeModal === 'breach'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <YouTubersModal isOpen={activeModal === 'youtubers'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
-      <CategoryManagerModal isOpen={activeModal === 'categoryManager'} onClose={() => setActiveModal(null)} categories={categories} onAdd={handleAddCategory} onUpdate={handleUpdateCategory} onDelete={handleDeleteCategory} />
+      <CategoryManagerModal isOpen={activeModal === 'categoryManager'} onClose={() => setActiveModal(null)} categories={categories} onAddCategory={handleAddCategory} onEditCategory={handleUpdateCategory} onDeleteCategory={handleDeleteCategory} />
 
       {activeModal === 'submission' && (
         <ToolSubmissionModal

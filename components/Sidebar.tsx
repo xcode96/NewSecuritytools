@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, categories, activeCate
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredCategories = categories.filter(cat =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    cat && cat.name && typeof cat.name === 'string' && cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

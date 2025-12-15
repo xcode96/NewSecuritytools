@@ -12,6 +12,9 @@ export interface Tool {
   tags?: string[];
   articles?: SubArticle[];
   isHidden?: boolean;
+  url?: string;
+  command?: string;
+  author?: string;
 }
 
 export interface GeneratedToolDetails {
