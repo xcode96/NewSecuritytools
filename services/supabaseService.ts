@@ -246,13 +246,31 @@ export const fetchBooks = async (): Promise<any[]> => {
         console.error('Error fetching books:', error);
         return [];
     }
-    return data || [];
+    // Map snake_case to camelCase for the UI
+    return (data || []).map((item: any) => ({
+        ...item,
+        amazonLink: item.url, // Map url to amazonLink
+        coverImage: item.cover_image
+    }));
 };
 
 export const addBook = async (book: any): Promise<boolean> => {
+    // Map camelCase to snake_case
+    const dbItem = {
+        title: book.title,
+        author: book.author,
+        description: book.description,
+        url: book.amazonLink || book.url,
+        cover_image: book.coverImage,
+        category: book.category,
+        tags: book.tags,
+        year: book.year,
+        pages: book.pages
+    };
+
     const { error } = await supabase
         .from('books')
-        .insert([book]);
+        .insert([dbItem]);
 
     if (error) {
         console.error('Error adding book:', error);
@@ -262,9 +280,22 @@ export const addBook = async (book: any): Promise<boolean> => {
 };
 
 export const updateBook = async (id: number, book: any): Promise<boolean> => {
+    // Map camelCase to snake_case
+    const dbItem = {
+        title: book.title,
+        author: book.author,
+        description: book.description,
+        url: book.amazonLink || book.url,
+        cover_image: book.coverImage,
+        category: book.category,
+        tags: book.tags,
+        year: book.year,
+        pages: book.pages
+    };
+
     const { error } = await supabase
         .from('books')
-        .update(book)
+        .update(dbItem)
         .eq('id', id);
 
     if (error) {

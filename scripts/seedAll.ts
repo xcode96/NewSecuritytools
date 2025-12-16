@@ -149,8 +149,29 @@ async function seedAll() {
     await seedUsefulLinks();
     await seedCertifications();
     await seedBreachServices();
+    await seedBooks();
 
     console.log('Done!');
+}
+
+
+async function seedBooks() {
+    console.log('Seeding Books...');
+    const { booksData } = await import('../data/books');
+    const items = booksData.map(item => ({
+        title: item.title,
+        author: item.author,
+        description: item.description,
+        url: item.amazonLink,
+        category: item.category,
+        tags: item.tags,
+        year: item.year,
+        pages: item.pages
+    }));
+
+    const { error } = await supabase.from('books').insert(items);
+    if (error) console.error('Error seeding Books:', error);
+    else console.log(`Seeded ${items.length} Books.`);
 }
 
 seedAll().catch(console.error);

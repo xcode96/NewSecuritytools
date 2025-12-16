@@ -501,8 +501,14 @@ const App: React.FC = () => {
                         try {
                           const updated = { ...tool, isHidden: !tool.isHidden };
                           setTools(prev => prev.map(t => t.id === tool.id ? updated : t));
-                        } catch (e) { console.error(e); }
+                          await updateTool(tool.name, updated);
+                        } catch (e) {
+                          console.error("Failed to toggle visibility", e);
+                          // Revert if failed
+                          setTools(prev => prev.map(t => t.id === tool.id ? tool : t));
+                        }
                       }}
+                      onDelete={() => handleDeleteTool(tool.id)}
                     />
                   </div>
                 ))}

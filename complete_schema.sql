@@ -36,6 +36,8 @@ create table if not exists public.books (
   category text,
   level text,
   tags text[],
+  year text,
+  pages text,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 

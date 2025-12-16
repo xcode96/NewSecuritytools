@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Tool } from '../types';
-import { PencilIcon, HeartIcon, HeartSolidIcon, EyeIcon, EyeSlashIcon, SparklesIcon } from './IconComponents';
+import { PencilIcon, HeartIcon, HeartSolidIcon, EyeIcon, EyeSlashIcon, SparklesIcon, TrashIcon } from './IconComponents';
 import { motion } from 'motion/react';
 
 interface ToolCardProps {
@@ -12,6 +12,7 @@ interface ToolCardProps {
   onToggleFavorite?: () => void;
   isHidden?: boolean;
   onToggleVisibility?: () => void;
+  onDelete?: () => void;
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({
@@ -22,7 +23,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   isFavorite = false,
   onToggleFavorite = () => { },
   isHidden = false,
-  onToggleVisibility = () => { }
+  onToggleVisibility = () => { },
+  onDelete = () => { }
 }) => {
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -135,14 +137,26 @@ export const ToolCard: React.FC<ToolCardProps> = ({
           <button
             onClick={handleVisibilityClick}
             className={`p-2 rounded-full backdrop-blur-md text-white hover:scale-110 transition-transform shadow-lg ${isHidden ? 'bg-red-500/80 border border-red-400' : 'bg-slate-700/50 border border-white/10'}`}
+            title={isHidden ? "Show Tool" : "Hide Tool"}
           >
             {isHidden ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
           </button>
           <button
             onClick={handleEditClick}
             className="p-2 rounded-full bg-blue-600/80 backdrop-blur-md border border-blue-400/50 text-white hover:scale-110 transition-transform shadow-lg"
+            title="Edit Tool"
           >
             <PencilIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="p-2 rounded-full bg-red-600/80 backdrop-blur-md border border-red-400/50 text-white hover:scale-110 transition-transform shadow-lg"
+            title="Delete Tool"
+          >
+            <TrashIcon className="w-4 h-4" />
           </button>
         </div>
       )}

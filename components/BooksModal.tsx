@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { booksData, BookCategory } from '../data/books';
-import {
-    XMarkIcon,
-    BookIcon,
-    SearchIcon,
-    SparklesIcon,
-    PlusIcon,
-    PencilIcon,
-    TrashIcon
-} from './IconComponents';
+import { fetchBooks, addBook, updateBook, deleteBook } from '../services/supabaseService';
+import { booksData } from '../data/books';
+import { XMarkIcon, BookIcon, PlusIcon, SearchIcon, PencilIcon, TrashIcon } from './IconComponents';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface BooksModalProps {
@@ -18,29 +11,44 @@ interface BooksModalProps {
 }
 
 const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [books, setBooks] = useState<any[]>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('books');
-                return saved ? JSON.parse(saved) : booksData;
-            } catch (e) {
-                console.warn("Failed to parse books from localStorage", e);
-                return booksData;
-            }
-        }
-        return booksData;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('books', JSON.stringify(books));
-    }, [books]);
+    const [books, setBooks] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Edit State
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            loadBooks();
+        }
+    }, [isOpen]);
+
+    const loadBooks = async () => {
+        setIsLoading(true);
+        try {
+            const data = await fetchBooks();
+            if (data && data.length > 0) {
+                setBooks(data);
+            } else {
+                // Fallback to static data if DB is empty (or mapped)
+                const mappedStatic = booksData.map(b => ({
+                    ...b,
+                    amazonLink: b.amazonLink,
+                    // other fields assume matching or close enough
+                }));
+                setBooks(mappedStatic);
+            }
+        } catch (err) {
+            console.error("Failed to load books", err);
+            setError("Failed to load books");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -100,7 +108,16 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen, isAdmin = fals
 
     const handleDeleteClick = async (id: number) => {
         if (window.confirm('Delete this book?')) {
-            setBooks(prev => prev.filter(b => b.id !== id));
+            try {
+                const success = await deleteBook(id);
+                if (success) {
+                    loadBooks();
+                } else {
+                    alert('Failed to delete book');
+                }
+            } catch (error) {
+                console.error('Error deleting book:', error);
+            }
         }
     };
 
@@ -113,18 +130,28 @@ const BooksModal: React.FC<BooksModalProps> = ({ onClose, isOpen, isAdmin = fals
             category: editForm.category,
             pages: editForm.pages,
             year: editForm.year,
-            amazon_link: editForm.amazon_link,
-            tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+            amazonLink: editForm.amazon_link,
+            tags: Array.isArray(editForm.tags) ? editForm.tags : editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
         };
 
-        if (editForm.id) {
-            setBooks(prev => prev.map(b => b.id === editForm.id ? { ...b, ...payload } : b));
-        } else {
-            const newBook = { ...payload, id: Date.now() }; // Local ID
-            setBooks(prev => [...prev, newBook]);
+        try {
+            let success;
+            if (editForm.id) {
+                success = await updateBook(editForm.id, payload);
+            } else {
+                success = await addBook(payload);
+            }
+
+            if (success) {
+                loadBooks();
+                setIsEditing(false);
+                setEditForm(null);
+            } else {
+                alert('Failed to save book');
+            }
+        } catch (error) {
+            console.error('Error saving book:', error);
         }
-        setIsEditing(false);
-        setEditForm(null);
     };
 
 
