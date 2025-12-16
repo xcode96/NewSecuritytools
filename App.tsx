@@ -19,6 +19,7 @@ import FrameworksModal from './components/FrameworksModal';
 import BreachServicesModal from './components/BreachServicesModal';
 import YouTubersModal from './components/YouTubersModal';
 import DataManagerModal from './components/DataManagerModal';
+import { Cheatsheets } from './components/Cheatsheets';
 
 import type { Tool, GeneratedToolDetails, ToolFormData, SubArticle, CategoryInfo, UserProfile } from './types';
 import { TOOLS } from './data/constants';
@@ -417,56 +418,59 @@ const App: React.FC = () => {
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300">
 
         <main className="flex-1 container mx-auto px-4 pb-32 pt-32">
-          {/* Tool Grid */}
-          {filteredTools.length > 0 || isAdminLoggedIn ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredTools.map(tool => (
-                <div key={tool.id} className="h-[280px]"> {/* Fixed height container */}
-                  <ToolCard
-                    tool={tool}
-                    onClick={() => handleToolClick(tool)}
-                    isAdmin={isAdminLoggedIn}
-                    onEdit={() => handleEditTool(tool)}
-                    isFavorite={favorites.includes(tool.name)}
-                    onToggleFavorite={() => toggleFavorite(tool.name)}
-                    isHidden={tool.isHidden}
-                    onToggleVisibility={async () => {
-                      // Optimistic + Service call
-                      try {
-                        const updated = { ...tool, isHidden: !tool.isHidden };
-                        setTools(prev => prev.map(t => t.id === tool.id ? updated : t));
-                      } catch (e) { console.error(e); }
-                    }}
-                  />
-                </div>
-              ))}
-              {/* Add New Tool Card (Admin Only) */}
-              {isAdminLoggedIn && (
-                <button
-                  onClick={() => setEditingTool({
-                    id: '', name: '', category: activeCategory !== 'All' && activeCategory !== 'Favorites' ? activeCategory : 'Network Scanning & Analysis',
-                    description: '', url: '', color: '#3b82f6', command: '',
-                    tags: []
-                  } as Tool)}
-                  className="h-[280px] rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all gap-4 group"
-                >
-                  <div className="p-4 rounded-full bg-slate-100 dark:bg-white/5 group-hover:scale-110 transition-transform">
-                    <PlusIcon className="w-8 h-8" />
-                  </div>
-                  <span className="font-bold">Add New Tool</span>
-                </button>
-              )}
-            </div>
+          {activeCategory === 'Cheatsheets' ? (
+            <Cheatsheets />
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
-                <SearchIcon className="w-10 h-10 text-slate-400" />
+            /* Tool Grid */
+            filteredTools.length > 0 || isAdminLoggedIn ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredTools.map(tool => (
+                  <div key={tool.id} className="h-[280px]"> {/* Fixed height container */}
+                    <ToolCard
+                      tool={tool}
+                      onClick={() => handleToolClick(tool)}
+                      isAdmin={isAdminLoggedIn}
+                      onEdit={() => handleEditTool(tool)}
+                      isFavorite={favorites.includes(tool.name)}
+                      onToggleFavorite={() => toggleFavorite(tool.name)}
+                      isHidden={tool.isHidden}
+                      onToggleVisibility={async () => {
+                        // Optimistic + Service call
+                        try {
+                          const updated = { ...tool, isHidden: !tool.isHidden };
+                          setTools(prev => prev.map(t => t.id === tool.id ? updated : t));
+                        } catch (e) { console.error(e); }
+                      }}
+                    />
+                  </div>
+                ))}
+                {/* Add New Tool Card (Admin Only) */}
+                {isAdminLoggedIn && (
+                  <button
+                    onClick={() => setEditingTool({
+                      id: '', name: '', category: activeCategory !== 'All' && activeCategory !== 'Favorites' ? activeCategory : 'Network Scanning & Analysis',
+                      description: '', url: '', color: '#3b82f6', command: '',
+                      tags: []
+                    } as Tool)}
+                    className="h-[280px] rounded-2xl border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all gap-4 group"
+                  >
+                    <div className="p-4 rounded-full bg-slate-100 dark:bg-white/5 group-hover:scale-110 transition-transform">
+                      <PlusIcon className="w-8 h-8" />
+                    </div>
+                    <span className="font-bold">Add New Tool</span>
+                  </button>
+                )}
               </div>
-              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">No tools found</h3>
-              <p className="text-slate-500 dark:text-slate-400">Try adjusting your search or category filter.</p>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
+                  <SearchIcon className="w-10 h-10 text-slate-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">No tools found</h3>
+                <p className="text-slate-500 dark:text-slate-400">Try adjusting your search or category filter.</p>
+              </div>
+            )
           )}
-
         </main>
 
         {/* Dock - Top Positioned */}

@@ -29,6 +29,7 @@ const getCategoryIcon = (categoryName: string): React.ReactElement => {
     case 'Social Engineering': return <SocialEngIcon className="w-6 h-6" />;
     case 'Cloud Security': return <CloudIcon className="w-6 h-6" />;
     case 'Notes': return <NotesIcon className="w-6 h-6" />;
+    case 'Cheatsheets': return <NotesIcon className="w-6 h-6" />;
     default: return <AllCategoriesIcon className="w-6 h-6" />;
   }
 };
@@ -112,6 +113,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, categories, activeCate
               onClick={() => onSelectCategory('Favorites')}
               isOpen={isOpen}
               color="pink"
+            />
+            <SidebarItem
+              icon={<NotesIcon className="w-6 h-6" />}
+              label="Cheatsheets"
+              isActive={activeCategory === 'Cheatsheets'}
+              onClick={() => onSelectCategory('Cheatsheets')}
+              isOpen={isOpen}
+              color="yellow"
             />
 
             <div className="my-4 border-b border-white/10 mx-2" />
