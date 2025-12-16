@@ -3,18 +3,17 @@ import { XMarkIcon } from './IconComponents';
 
 interface AdminLoginModalProps {
   onClose: () => void;
-  onLogin: (user: string, pass: string) => boolean;
+  onLogin: (code: string) => Promise<boolean>;
 }
 
 const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onClose, onLogin }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [error, setError] = useState('');
-  const usernameInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Focus the username input when the modal opens
-    usernameInputRef.current?.focus();
+    // Focus the input when the modal opens
+    inputRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -25,24 +24,24 @@ const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onClose, onLogin }) =
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = onLogin(username, password);
+    const success = await onLogin(code);
     if (!success) {
-      setError('Invalid username or password.');
+      setError('Invalid unique access code or login failed.');
     }
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
       aria-modal="true"
       role="dialog"
     >
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-sm relative" onClick={(e) => e.stopPropagation()}>
         <header className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Admin Login</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Admin Access</h2>
           <button
             onClick={onClose}
             className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
@@ -60,42 +59,27 @@ const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onClose, onLogin }) =
           )}
           <div>
             <label
-              htmlFor="username"
+              htmlFor="code"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Username
+              Unique Code
             </label>
             <input
-              ref={usernameInputRef}
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
-            >
-              Password
-            </label>
-            <input
-              id="password"
+              ref={inputRef}
+              id="code"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
               required
+              placeholder="Enter unique code..."
             />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm"
           >
-            Login
+            Access Dashboard
           </button>
         </form>
       </div>

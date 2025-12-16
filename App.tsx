@@ -205,36 +205,19 @@ const App: React.FC = () => {
     setSelectedTool(null);
   };
 
-  const handleAdminLogin = async (username: string, pass: string) => {
-    // Map dqadm to the secure email
-    let email = username;
-    if (username === 'dqadm') {
-      email = 'dqadm@admin.com';
+  const handleAdminLogin = async (code: string) => {
+    // Super Admin Code Bypass
+    if (code === 'dqadm') {
+      console.log("🚀 Super Admin Code accepted. Bypassing verification.");
+      setIsAdminLoggedIn(true);
+      setShowAdminLogin(false);
+      localStorage.setItem('isAdminLoggedIn', 'true');
+      return true;
     }
 
-    try {
-      const { data, error } = await signInWithEmail(email, pass);
-
-      if (error || !data.user) {
-        console.error("Login failed:", error);
-        return false;
-      }
-
-      // Check if the user is actually an admin
-      const adminStatus = await isAdmin();
-      if (adminStatus) {
-        setIsAdminLoggedIn(true);
-        setShowAdminLogin(false);
-        return true;
-      } else {
-        // User logged in but not an admin
-        await signOut();
-        return false;
-      }
-    } catch (err) {
-      console.error("Unexpected login error:", err);
-      return false;
-    }
+    // Standard Login (for other codes if properly implemented later)
+    // Currently only supporting the super admin bypass as requested
+    return false;
   };
 
   const handleEditTool = (tool: Tool) => {
@@ -420,9 +403,13 @@ const App: React.FC = () => {
         tool.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
       );
     }
+    // Filter out hidden tools if not admin
+    if (!isAdminLoggedIn) {
+      filtered = filtered.filter(tool => !tool.isHidden);
+    }
 
     return filtered;
-  }, [tools, activeCategory, searchQuery, favorites]);
+  }, [tools, activeCategory, searchQuery, favorites, isAdminLoggedIn]);
 
   // Dock items configuration
   const dockItems = [
