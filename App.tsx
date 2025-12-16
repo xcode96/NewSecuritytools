@@ -1,5 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { categoryInfo } from './data/tools';
+import {
+  fetchTools, addTool, updateTool, deleteTool,
+  fetchCategories, addCategory, updateCategory, deleteCategory
+} from './services/supabaseService';
 import { ToolCard } from './components/ToolCard';
 import ToolDetailModal from './components/ToolDetailModal';
 import AdminLoginModal from './components/AdminLoginModal';
@@ -64,58 +68,7 @@ type Theme = 'light' | 'dark';
 const App: React.FC = () => {
 
   console.log('App component rendering...');
-  const [tools, setTools] = useState<Tool[]>(() => {
-    let initialTools: Tool[] = [];
-    try {
-      const savedTools = localStorage.getItem('tools');
-      if (savedTools) {
-        initialTools = JSON.parse(savedTools) as Tool[];
-        // Ensure all saved tools have IDs
-        initialTools = initialTools.map(t => ({ ...t, id: t.id || crypto.randomUUID() }));
-      }
-    } catch (error) {
-      console.error("Failed to parse tools from localStorage:", error);
-    }
-
-    if (initialTools.length === 0) {
-      return TOOLS.map(t => ({ ...t, id: crypto.randomUUID() }));
-    }
-
-    // Merge strategy: Sync static content (articles) from constants.ts to ensure code updates appear
-    const mergedTools = [...initialTools];
-    let hasChanges = false;
-
-    TOOLS.forEach(staticTool => {
-      const existingIndex = mergedTools.findIndex(t => t.name === staticTool.name);
-
-      if (existingIndex !== -1) {
-        // Tool exists: Sync articles if static version has them
-        // This ensures if you add a guide in code, it shows up
-        if (staticTool.articles && staticTool.articles.length > 0) {
-          const currentArticles = mergedTools[existingIndex].articles || [];
-          // Simple check: if JSON stringify differs, update (or just always update to trust code)
-          // We'll trust code for articles to fix the immediate "New guide not showing" issue
-          if (JSON.stringify(currentArticles) !== JSON.stringify(staticTool.articles)) {
-            mergedTools[existingIndex] = {
-              ...mergedTools[existingIndex],
-              articles: staticTool.articles
-            };
-            hasChanges = true;
-          }
-        }
-      } else {
-        // Tool new in code: Add it
-        mergedTools.push({ ...staticTool, id: crypto.randomUUID() });
-        hasChanges = true;
-      }
-    });
-
-    if (hasChanges) {
-      console.log("Merged static tools into local state");
-    }
-
-    return mergedTools;
-  });
+  const [tools, setTools] = useState<Tool[]>([]);
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -159,18 +112,7 @@ const App: React.FC = () => {
     }
     return [];
   });
-  const [categories, setCategories] = useState<CategoryInfo[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('categories');
-        return saved ? JSON.parse(saved) : categoryInfo;
-      } catch (e) {
-        console.warn("Failed to parse categories from localStorage", e);
-        return categoryInfo;
-      }
-    }
-    return categoryInfo;
-  });
+  const [categories, setCategories] = useState<CategoryInfo[]>([]);
 
   // Modals state
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -183,6 +125,28 @@ const App: React.FC = () => {
     checkMobile(); // Check on mount
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Fetch Data from Supabase
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const [fetchedTools, fetchedCategories] = await Promise.all([
+          fetchTools(),
+          fetchCategories()
+        ]);
+        setTools(fetchedTools);
+        // Fallback to static categories if DB is empty (rare, but safe)
+        setCategories(fetchedCategories.length > 0 ? fetchedCategories : categoryInfo);
+      } catch (err) {
+        console.error("Failed to load data:", err);
+        setLoadingError("Failed to load data from server.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   // Apply Theme Effect
@@ -253,37 +217,42 @@ const App: React.FC = () => {
   };
 
   const handleSaveTool = async (formData: ToolFormData) => {
-    // updateTool expects (originalName, fullToolObject)
-    // We need to ensure we pass the full object associated with the FormData
-    // Static mode: Just update state
-    if (editingTool && editingTool.id) {
-      const mergedTool: Tool = { ...editingTool, ...formData };
-      setTools(prev => prev.map(t => t.id === editingTool.id ? mergedTool : t));
-      setEditingTool(null);
-    } else {
-      const newToolPayload: Tool = {
-        ...formData,
-        articles: [],
-        isHidden: false,
-        id: crypto.randomUUID()
-      } as Tool;
-      console.log("Creating new tool:", newToolPayload);
-      setTools(prev => [...prev, newToolPayload]);
-      if (activeCategory !== 'All' && activeCategory !== newToolPayload.category) {
-        setActiveCategory('All');
+    setIsLoading(true);
+    try {
+      let success = false;
+      if (editingTool && editingTool.id) {
+        // Update
+        const mergedTool: Tool = { ...editingTool, ...formData, articles: editingTool.articles || [], isHidden: editingTool.isHidden || false };
+        success = await updateTool(editingTool.name, mergedTool);
+      } else {
+        // Add
+        const newToolPayload: Tool = {
+          ...formData,
+          articles: [],
+          isHidden: false
+        } as Tool;
+        success = await addTool(newToolPayload);
       }
-      setSearchQuery(''); // Ensure tool is visible if filters are active
-      setEditingTool(null);
+
+      if (success) {
+        const fetchedTools = await fetchTools();
+        setTools(fetchedTools);
+        setEditingTool(null);
+        if (activeCategory !== 'All' && activeCategory !== formData.category) {
+          setActiveCategory('All');
+        }
+        setSearchQuery('');
+      } else {
+        alert('Failed to save tool. Please check the console.');
+      }
+    } catch (e) {
+      console.error("Error saving tool:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('tools', JSON.stringify(tools));
-    } catch (error) {
-      console.error("Failed to save tools to localStorage (Quota Exceeded?):", error);
-    }
-  }, [tools]);
+
 
   // Keep selectedTool in sync with tools array
   useEffect(() => {
@@ -300,13 +269,7 @@ const App: React.FC = () => {
   }, [tools, selectedTool]);
 
   // Persist Categories
-  useEffect(() => {
-    try {
-      localStorage.setItem('categories', JSON.stringify(categories));
-    } catch (error) {
-      console.error("Failed to save categories to localStorage:", error);
-    }
-  }, [categories]);
+
 
 
   const handleDeleteTool = async (toolId: string) => {
@@ -314,9 +277,18 @@ const App: React.FC = () => {
     if (!tool) return;
 
     if (window.confirm(`Are you sure you want to delete ${tool.name}?`)) {
-      setTools(prev => prev.filter(t => t.id !== toolId));
-      if (selectedTool?.id === toolId) {
-        setSelectedTool(null);
+      setIsLoading(true);
+      try {
+        await deleteTool(tool.name);
+        const fetchedTools = await fetchTools();
+        setTools(fetchedTools);
+        if (selectedTool?.id === toolId) {
+          setSelectedTool(null);
+        }
+      } catch (e) {
+        console.error("Error deleting tool:", e);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -331,26 +303,25 @@ const App: React.FC = () => {
   };
 
   const handleSaveArticle = async (toolName: string, articles: SubArticle[]) => {
-    console.log('🔵 handleSaveArticle called for:', toolName);
-    console.log('🔵 New articles array:', articles);
-
     const toolToUpdate = tools.find(t => t.name === toolName);
-    if (!toolToUpdate) {
-      console.error('❌ Tool not found:', toolName);
-      return;
-    }
+    if (!toolToUpdate) return;
 
     const updatedToolObj: Tool = { ...toolToUpdate, articles };
-    console.log('🔵 Updated tool object:', updatedToolObj);
+    setIsLoading(true);
+    try {
+      await updateTool(toolName, updatedToolObj);
+      const fetchedTools = await fetchTools();
+      setTools(fetchedTools);
 
-    setTools(prev => prev.map(t => t.id === toolToUpdate.id ? updatedToolObj : t));
-    console.log('✅ Tools array updated');
+      setArticleEditorState(null);
 
-    setArticleEditorState(null);
-    console.log('✅ Article editor closed');
-
-    setSelectedTool(updatedToolObj);
-    console.log('✅ Selected tool set to:', updatedToolObj.name, 'with', updatedToolObj.articles?.length, 'articles');
+      const refreshedTool = fetchedTools.find(t => t.name === toolName);
+      if (refreshedTool) setSelectedTool(refreshedTool);
+    } catch (e) {
+      console.error("Error saving article:", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -371,33 +342,36 @@ const App: React.FC = () => {
   // Category Management Handlers
   // Category Management Handlers
   const handleAddCategory = async (category: CategoryInfo) => {
-    // Check if category already exists to avoid duplicates (though modal checks too)
-    setCategories(prev => {
-      if (prev.some(c => c.name === category.name)) return prev;
-      return [...prev, category];
-    });
+    setIsLoading(true);
+    try {
+      await addCategory(category);
+      const cats = await fetchCategories();
+      setCategories(cats);
+    } catch (e) { console.error(e); } finally { setIsLoading(false); }
   };
 
   const handleUpdateCategory = async (originalName: string, updatedCategory: CategoryInfo) => {
-    setCategories(prev => prev.map(c => c.name === originalName ? updatedCategory : c));
-
-    // Also update tools that were in this category
-    setTools(prev => prev.map(t => {
-      if (t.category === originalName) {
-        return { ...t, category: updatedCategory.name };
+    setIsLoading(true);
+    try {
+      await updateCategory(originalName, updatedCategory);
+      const [cats, fetchedTools] = await Promise.all([fetchCategories(), fetchTools()]);
+      setCategories(cats);
+      setTools(fetchedTools); // Tools category names might have changed
+      if (activeCategory === originalName) {
+        setActiveCategory(updatedCategory.name);
       }
-      return t;
-    }));
-
-    if (activeCategory === originalName) {
-      setActiveCategory(updatedCategory.name);
-    }
+    } catch (e) { console.error(e); } finally { setIsLoading(false); }
   };
 
   const handleDeleteCategory = async (categoryName: string) => {
-    setCategories(prev => prev.filter(c => c.name !== categoryName));
-    if (activeCategory === categoryName) {
-      setActiveCategory('All');
+    if (window.confirm(`Delete category ${categoryName}?`)) {
+      setIsLoading(true);
+      try {
+        await deleteCategory(categoryName);
+        const cats = await fetchCategories();
+        setCategories(cats);
+        if (activeCategory === categoryName) setActiveCategory('All');
+      } catch (e) { console.error(e); } finally { setIsLoading(false); }
     }
   };
 

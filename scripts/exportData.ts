@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Import all data
-import { toolsData } from '../data/tools';
+// Import all data
+import { TOOLS } from '../data/constants';
 import { booksData } from '../data/books';
 import { usefulLinksData } from '../data/usefulLinks';
 import { platformsData } from '../data/platforms';
@@ -30,7 +31,7 @@ function exportToJSON(data: any[], filename: string) {
 // Export all data
 console.log('🚀 Starting data export...\n');
 
-exportToJSON(toolsData, 'tools.json');
+exportToJSON(TOOLS, 'tools.json');
 exportToJSON(booksData, 'books.json');
 exportToJSON(usefulLinksData, 'useful-links.json');
 exportToJSON(platformsData, 'platforms.json');

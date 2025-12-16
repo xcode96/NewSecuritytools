@@ -1,0 +1,326 @@
+[
+  {
+    "id": "1",
+    "name": "Kali Linux",
+    "code": "Kali Linux",
+    "type": "ISO",
+    "category": "Linux Security Distributions",
+    "team": "Red Team",
+    "description": "Advanced penetration testing and security auditing Linux distribution.",
+    "popularity": 95,
+    "keyFeatures": [
+      "600+ Security Tools",
+      "Metasploit Framework",
+      "Burp Suite",
+      "Nmap",
+      "Wireshark"
+    ],
+    "link": "https://www.kali.org/get-kali/"
+  },
+  {
+    "id": "2",
+    "name": "Parrot Security OS",
+    "code": "Parrot Security OS",
+    "type": "ISO",
+    "category": "Linux Security Distributions",
+    "team": "Red Team",
+    "description": "Security-oriented operating system designed for penetration testing, digital forensics, and privacy protection.",
+    "popularity": 85,
+    "keyFeatures": [
+      "Lightweight",
+      "Privacy Tools",
+      "Pentesting Suite",
+      "Forensics Tools",
+      "Cryptography"
+    ],
+    "link": "https://parrotsec.org/download/"
+  },
+  {
+    "id": "3",
+    "name": "BlackArch Linux",
+    "code": "BlackArch Linux",
+    "type": "ISO",
+    "category": "Linux Security Distributions",
+    "team": "Red Team",
+    "description": "Arch Linux-based penetration testing distribution with over 2800 tools.",
+    "popularity": 75,
+    "keyFeatures": [
+      "2800+ Tools",
+      "Rolling Release",
+      "Lightweight",
+      "Modular",
+      "Arch-based"
+    ],
+    "link": "https://blackarch.org/downloads.html"
+  },
+  {
+    "id": "4",
+    "name": "Pentoo Linux",
+    "code": "Pentoo Linux",
+    "type": "ISO",
+    "category": "Linux Security Distributions",
+    "team": "Red Team",
+    "description": "Gentoo-based security-focused Linux distribution for penetration testing.",
+    "popularity": 65,
+    "keyFeatures": [
+      "Hardened Kernel",
+      "GRSEC/PaX",
+      "Custom Tools",
+      "Live Boot",
+      "Persistence"
+    ],
+    "link": "https://pentoo.ch/downloads/"
+  },
+  {
+    "id": "5",
+    "name": "CAINE Linux",
+    "code": "CAINE Linux",
+    "type": "ISO",
+    "category": "Digital Forensics",
+    "team": "Blue Team",
+    "description": "Computer Aided INvestigative Environment for digital forensics.",
+    "popularity": 80,
+    "keyFeatures": [
+      "Autopsy",
+      "Sleuth Kit",
+      "PhotoRec",
+      "Volatility",
+      "Wireshark"
+    ],
+    "link": "https://www.caine-live.net/"
+  },
+  {
+    "id": "6",
+    "name": "DEFT Linux",
+    "code": "DEFT Linux",
+    "type": "ISO",
+    "category": "Digital Forensics",
+    "team": "Blue Team",
+    "description": "Digital Evidence & Forensics Toolkit for incident response and digital forensics.",
+    "popularity": 70,
+    "keyFeatures": [
+      "DART",
+      "Mobile Forensics",
+      "Network Analysis",
+      "Memory Dump",
+      "Hash Tools"
+    ],
+    "link": "http://www.deftlinux.net/"
+  },
+  {
+    "id": "7",
+    "name": "PALADIN",
+    "code": "PALADIN",
+    "type": "ISO",
+    "category": "Digital Forensics",
+    "team": "Blue Team",
+    "description": "Linux-based forensic suite with a focus on simplicity and ease of use.",
+    "popularity": 75,
+    "keyFeatures": [
+      "User-Friendly",
+      "Write Blocking",
+      "Imaging Tools",
+      "Analysis Suite",
+      "Reporting"
+    ],
+    "link": "https://sumuri.com/software/paladin/"
+  },
+  {
+    "id": "8",
+    "name": "Windows 11 Enterprise",
+    "code": "WIN",
+    "type": "ISO",
+    "category": "Windows Security Tools",
+    "team": "Blue Team",
+    "description": "Latest Windows 11 Enterprise edition with advanced security features.",
+    "popularity": 90,
+    "keyFeatures": [
+      "Windows Defender",
+      "BitLocker",
+      "Windows Hello",
+      "Credential Guard",
+      "Device Guard"
+    ],
+    "link": "https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-enterprise"
+  },
+  {
+    "id": "9",
+    "name": "Windows Server 2022",
+    "code": "WIN",
+    "type": "ISO",
+    "category": "Windows Security Tools",
+    "team": "Blue Team",
+    "description": "Enterprise-grade server operating system with enhanced security.",
+    "popularity": 85,
+    "keyFeatures": [
+      "Secured-core",
+      "Windows Admin Center",
+      "Hyper-V",
+      "Storage Spaces",
+      "Failover Clustering"
+    ],
+    "link": "https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2022"
+  },
+  {
+    "id": "10",
+    "name": "Ubuntu Server LTS",
+    "code": "Ubuntu Server LTS",
+    "type": "ISO",
+    "category": "Ubuntu & Debian",
+    "team": "Blue Team",
+    "description": "Long Term Support server edition perfect for security infrastructure.",
+    "popularity": 95,
+    "keyFeatures": [
+      "LTS Support",
+      "Security Updates",
+      "Container Ready",
+      "Cloud Integration",
+      "Snap Packages"
+    ],
+    "link": "https://ubuntu.com/download/server"
+  },
+  {
+    "id": "11",
+    "name": "Ubuntu Desktop LTS",
+    "code": "Ubuntu Desktop LTS",
+    "type": "ISO",
+    "category": "Ubuntu & Debian",
+    "team": "Blue Team",
+    "description": "User-friendly Linux distribution with excellent security tools support.",
+    "popularity": 90,
+    "keyFeatures": [
+      "GNOME Desktop",
+      "Snap Store",
+      "Firefox",
+      "LibreOffice",
+      "Security Center"
+    ],
+    "link": "https://ubuntu.com/download/desktop"
+  },
+  {
+    "id": "12",
+    "name": "Debian Security",
+    "code": "Debian Security",
+    "type": "ISO",
+    "category": "Ubuntu & Debian",
+    "team": "Blue Team",
+    "description": "Rock-solid Linux distribution with excellent security track record.",
+    "popularity": 85,
+    "keyFeatures": [
+      "Stability",
+      "Security Focus",
+      "Package Management",
+      "Free Software",
+      "Community Support"
+    ],
+    "link": "https://www.debian.org/download"
+  },
+  {
+    "id": "13",
+    "name": "pfSense",
+    "code": "pfSense",
+    "type": "ISO",
+    "category": "Specialized Tools",
+    "team": "Blue Team",
+    "description": "Open source firewall and router platform based on FreeBSD.",
+    "popularity": 90,
+    "keyFeatures": [
+      "Firewall",
+      "VPN Server",
+      "Traffic Shaping",
+      "Load Balancing",
+      "Intrusion Detection"
+    ],
+    "link": "https://shop.netgate.com/products/netgate-installer"
+  },
+  {
+    "id": "14",
+    "name": "Security Onion",
+    "code": "Security Onion",
+    "type": "ISO",
+    "category": "Specialized Tools",
+    "team": "Blue Team",
+    "description": "Linux distribution for threat hunting, enterprise security monitoring, and log management.",
+    "popularity": 80,
+    "keyFeatures": [
+      "Elasticsearch",
+      "Logstash",
+      "Kibana",
+      "Suricata",
+      "Zeek"
+    ],
+    "link": "https://securityonionsolutions.com/software/"
+  },
+  {
+    "id": "15",
+    "name": "SIFT Workstation",
+    "code": "SIFT Workstation",
+    "type": "ISO",
+    "category": "Specialized Tools",
+    "team": "Blue Team",
+    "description": "SANS Investigative Forensic Toolkit for digital forensics and incident response.",
+    "popularity": 85,
+    "keyFeatures": [
+      "Timeline Analysis",
+      "Memory Analysis",
+      "File Analysis",
+      "Network Analysis",
+      "Registry Analysis"
+    ],
+    "link": "https://www.sans.org/tools/sift-workstation/"
+  },
+  {
+    "id": "16",
+    "name": "REMnux",
+    "code": "REMnux",
+    "type": "ISO",
+    "category": "Specialized Tools",
+    "team": "Blue Team",
+    "description": "Linux toolkit for reverse-engineering and analyzing malicious software.",
+    "popularity": 75,
+    "keyFeatures": [
+      "Malware Analysis",
+      "Reverse Engineering",
+      "Memory Forensics",
+      "Network Analysis",
+      "Static Analysis"
+    ],
+    "link": "https://remnux.org/get-the-remnux-distro/"
+  },
+  {
+    "id": "17",
+    "name": "Node.js LTS",
+    "code": "Node.js LTS",
+    "type": "Tool",
+    "category": "Development Tools",
+    "team": "Development",
+    "description": "JavaScript runtime for building security tools and applications.",
+    "popularity": 95,
+    "keyFeatures": [
+      "NPM Package Manager",
+      "Security Modules",
+      "Async Programming",
+      "Cross-platform",
+      "Large Ecosystem"
+    ],
+    "link": "https://nodejs.org/en/download"
+  },
+  {
+    "id": "18",
+    "name": "Python Security",
+    "code": "Python Security",
+    "type": "Tool",
+    "category": "Development Tools",
+    "team": "Development",
+    "description": "Python distribution with security-focused libraries and tools.",
+    "popularity": 100,
+    "keyFeatures": [
+      "Scapy",
+      "Requests",
+      "Cryptography",
+      "Paramiko",
+      "Beautiful Soup"
+    ],
+    "link": "https://www.python.org/downloads/"
+  }
+]
