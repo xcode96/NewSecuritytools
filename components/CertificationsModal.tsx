@@ -10,7 +10,12 @@ import {
     PlusIcon
 } from './IconComponents';
 import { motion } from 'motion/react';
-// Removed Supabase imports
+import {
+    fetchCertifications,
+    addCertification,
+    updateCertification,
+    deleteCertification
+} from '../services/supabaseService';
 import CertificationFormModal from './CertificationFormModal';
 
 interface CertificationsModalProps {
@@ -22,35 +27,82 @@ interface CertificationsModalProps {
 const CertificationsModal: React.FC<CertificationsModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
     const [activeCategory, setActiveCategory] = useState<CertificationCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
-    const [certifications, setCertifications] = useState<Certification[]>(staticCertificationsData);
-    const [loading, setLoading] = useState(false);
+    const [certifications, setCertifications] = useState<Certification[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingCert, setEditingCert] = useState<Certification | undefined>(undefined);
-
-    // Effect removed as we load static data directly into state
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') onClose();
         };
-        if (isOpen) window.addEventListener('keydown', handleKeyDown);
+        if (isOpen) {
+            window.addEventListener('keydown', handleKeyDown);
+            loadStartData();
+        }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
+    const loadStartData = async () => {
+        setIsLoading(true);
+        try {
+            const data = await fetchCertifications();
+            if (data && data.length > 0) {
+                // Map Supabase data to Certification interface
+                // Supabase returns keys in camelCase because of the transformation in fetchCertifications
+                // We just need to ensure ID is string if interface expects string
+                const mapped: Certification[] = data.map((item: any) => ({
+                    ...item,
+                    id: item.id.toString(), // Ensure ID is string
+                    // Ensure numeric fields are numbers
+                    rating: Number(item.rating),
+                    difficulty: Number(item.difficulty),
+                    popularity: Number(item.popularity),
+                    jobMarket: Number(item.jobMarket),
+                }));
+                setCertifications(mapped);
+            } else {
+                setCertifications(staticCertificationsData);
+            }
+        } catch (error) {
+            console.error("Failed to load certifications", error);
+            setCertifications(staticCertificationsData);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleSave = async (certData: Omit<Certification, 'id'> | Certification) => {
         if (editingCert) {
-            // Update local state
-            setCertifications(prev => prev.map(c => c.id === (certData as Certification).id ? (certData as Certification) : c));
+            // Update
+            const id = Number(editingCert.id); // Convert back to number for DB
+            const success = await updateCertification(id, certData);
+            if (success) {
+                loadStartData();
+            } else {
+                alert('Failed to update certification');
+            }
         } else {
-            // Add to local state
-            const newCert = { ...certData, id: Date.now().toString() } as Certification;
-            setCertifications(prev => [...prev, newCert]);
+            // Add
+            const success = await addCertification(certData);
+            if (success) {
+                loadStartData();
+            } else {
+                alert('Failed to add certification');
+            }
         }
+        setIsFormOpen(false);
+        setEditingCert(undefined);
     };
 
     const handleDelete = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this certification?')) {
-            setCertifications(prev => prev.filter(c => c.id !== id));
+            const success = await deleteCertification(Number(id));
+            if (success) {
+                loadStartData();
+            } else {
+                alert('Failed to delete certification');
+            }
         }
     };
 

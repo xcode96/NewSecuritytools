@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { platformsData, PlatformCategory } from '../data/platforms';
+import { fetchPlatforms, addPlatform, updatePlatform, deletePlatform } from '../services/supabaseService';
 import {
     XMarkIcon,
     GlobeIcon,
@@ -18,11 +19,33 @@ interface PlatformsModalProps {
 }
 
 const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [platforms, setPlatforms] = useState<any[]>(platformsData);
+    const [platforms, setPlatforms] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState<PlatformCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
+
+    const loadStartData = async () => {
+        const data = await fetchPlatforms();
+        if (data && data.length > 0) {
+            // Map DB fields
+            // DB: name, description, url, features(text[]), type, pricing_model
+            // New Cols: rating, founded, hackers, notable_companies(text[])
+            const mapped = data.map((item: any) => ({
+                ...item,
+                payoutRange: item.pricing_model,
+                notableCompanies: item.notable_companies,
+                // features is already array (hopefully)
+            }));
+            setPlatforms(mapped);
+        } else {
+            setPlatforms(platformsData);
+        }
+    };
+
+    useEffect(() => {
+        loadStartData();
+    }, [isOpen]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -30,12 +53,9 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
         };
         if (isOpen) {
             window.addEventListener('keydown', handleKeyDown);
-            // loadPlatforms();
         }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
-
-    // loadPlatforms removed
 
     const filteredPlatforms = useMemo(() => {
         return platforms.filter(item => {
@@ -70,27 +90,36 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
         setIsEditing(true);
     };
 
-    const handleDeleteClick = (id: number) => {
+    const handleDeleteClick = async (id: number) => {
         if (window.confirm('Delete this platform?')) {
-            setPlatforms(prev => prev.filter(p => p.id !== id));
+            const success = await deletePlatform(id);
+            if (success) {
+                setPlatforms(prev => prev.filter(p => p.id !== id));
+            } else {
+                alert('Failed to delete');
+            }
         }
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         const payload = {
             name: editForm.name,
             description: editForm.description,
             category: editForm.category,
             url: editForm.url,
-            tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
+            // tags? DB doesn't have tags column for platforms? 
+            // My script added rating, founded, hackers, notable_companies.
+            // Features exists.
             features: editForm.features.split('\n').map((f: string) => f.trim()).filter(Boolean)
         };
+
         if (editForm.id) {
-            setPlatforms(prev => prev.map(p => p.id === editForm.id ? { ...p, ...payload } : p));
+            const success = await updatePlatform(editForm.id, payload);
+            if (success) loadStartData();
         } else {
-            const newPlatform = { ...payload, id: Date.now() };
-            setPlatforms(prev => [...prev, newPlatform]);
+            const success = await addPlatform(payload);
+            if (success) loadStartData();
         }
         setIsEditing(false);
     };

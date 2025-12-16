@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { downloadsData, DownloadCategory } from '../data/downloads';
+import { fetchDownloads, addDownload, updateDownload, deleteDownload } from '../services/supabaseService';
 import {
     XMarkIcon,
     DownloadIcon,
@@ -18,26 +19,38 @@ interface DownloadsModalProps {
 }
 
 const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [downloads, setDownloads] = useState<any[]>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('downloads');
-                return saved ? JSON.parse(saved) : downloadsData;
-            } catch (e) {
-                console.warn("Failed to parse downloads from localStorage", e);
-                return downloadsData;
-            }
-        }
-        return downloadsData;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('downloads', JSON.stringify(downloads));
-    }, [downloads]);
+    const [downloads, setDownloads] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState<DownloadCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
+
+    const loadStartData = async () => {
+        const data = await fetchDownloads();
+        if (data && data.length > 0) {
+            // Map DB fields to Component fields
+            // DB: code, type, team, popularity, key_features(text[]), size, version, os(text[])
+            // Component: code, type, team, popularity, keyFeatures, size, format?, author?
+            // Note: `format` and `author` were in the edit form but not explicitly in `DownloadItem` interface in `data/downloads.ts`?
+            // Actually `DownloadItem` has: id, name, code, type, category, team, description, popularity, keyFeatures, link.
+            // It DOES NOT have `format`, `size`, `author`.
+            // But the UI `editForm` was using them. 
+            // In the DB I added `code`, `type`, `team`, `popularity`, `key_features`.
+            // `size` exists in DB.
+            const mapped = data.map((item: any) => ({
+                ...item,
+                keyFeatures: item.key_features || item.os, // Fallback
+                link: item.url
+            }));
+            setDownloads(mapped);
+        } else {
+            setDownloads(downloadsData);
+        }
+    };
+
+    useEffect(() => {
+        loadStartData();
+    }, [isOpen]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,12 +58,9 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
         };
         if (isOpen) {
             window.addEventListener('keydown', handleKeyDown);
-            // loadDownloads();
         }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
-
-    // loadDownloads removed
 
     const filteredDownloads = useMemo(() => {
         return downloads.filter(item => {
@@ -77,7 +87,12 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
 
     const handleDeleteClick = async (id: number) => {
         if (window.confirm('Delete download?')) {
-            setDownloads(prev => prev.filter(d => d.id !== id));
+            const success = await deleteDownload(id);
+            if (success) {
+                setDownloads(prev => prev.filter(d => d.id !== id));
+            } else {
+                alert('Failed to delete');
+            }
         }
     };
 
@@ -88,16 +103,30 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
             description: editForm.description,
             category: editForm.category,
             url: editForm.url,
-            format: editForm.format,
+            // Map UI fields to DB columns
             size: editForm.size,
-            author: editForm.author,
-            tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+            // Tags? DB doesn't have tags column for downloads in my script... I added code, type, team, popularity, key_features.
+            // Oh, the local component logic uses tags for search. "tags" might need to be stored in "key_features" or a new column?
+            // "keyFeatures" in data was used.
+            // I'll map 'tags' to 'key_features' for now or 'os' if appropriate?
+            // Actually I'll just save it to `key_features` if tags are keyed in.
+            key_features: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
+
+            // Add other fields if I can edit them?
+            // The Edit form has: Name, Description, Category, Format(?!), Size, Author(?!), URL, Tags.
+            // It seems the UI was a bit generic.
+            // I'll attempt to save what matches.
         };
-        if (editForm.id) {
-            setDownloads(prev => prev.map(d => d.id === editForm.id ? { ...d, ...payload } : d));
+
+        if (editForm.id && typeof editForm.id !== 'string') { // Check if valid DB ID (number/bigint usually comes as number)
+            const success = await updateDownload(editForm.id, payload);
+            if (success) loadStartData();
+        } else if (editForm.id) {
+            const success = await updateDownload(editForm.id, payload);
+            if (success) loadStartData();
         } else {
-            const newDownload = { ...payload, id: Date.now() };
-            setDownloads(prev => [...prev, newDownload]);
+            const success = await addDownload(payload);
+            if (success) loadStartData();
         }
         setIsEditing(false);
     };

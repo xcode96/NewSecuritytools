@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { youtubersData, YouTuberCategory } from '../data/youtubers';
+import { fetchYouTubers, addYouTuber, updateYouTuber, deleteYouTuber } from '../services/supabaseService';
 import {
     XMarkIcon,
     VideoIcon,
@@ -19,26 +20,36 @@ interface YouTubersModalProps {
 }
 
 const YouTubersModal: React.FC<YouTubersModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [youtubers, setYoutubers] = useState<any[]>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('youtubers');
-                return saved ? JSON.parse(saved) : youtubersData;
-            } catch (e) {
-                console.warn("Failed to parse youtubers from localStorage", e);
-                return youtubersData;
-            }
-        }
-        return youtubersData;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('youtubers', JSON.stringify(youtubers));
-    }, [youtubers]);
+    const [youtubers, setYoutubers] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState<YouTuberCategory | 'All'>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
+
+    const loadStartData = async () => {
+        const data = await fetchYouTubers();
+        if (data && data.length > 0) {
+            // Map DB fields if needed, but fetchYouTubers might return raw snake_case or mapped?
+            // services/supabaseService.ts: fetchYouTubers returns select('*')
+            // DB has: name, description, url, icon, category, subscribers, topics
+            // Component expects: name, description, tags, url, category
+            // We need to map `topics` -> `tags`, `url` -> `link`/`url`
+            const mapped = data.map((item: any) => ({
+                ...item,
+                tags: item.topics,
+                url: item.url || item.link
+            }));
+            setYoutubers(mapped);
+        } else {
+            // Fallback to static data if DB empty? 
+            // Or just set empty. Users prefer fallback usually.
+            setYoutubers(youtubersData);
+        }
+    };
+
+    useEffect(() => {
+        loadStartData();
+    }, [isOpen]); // Reload when opened
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -46,12 +57,9 @@ const YouTubersModal: React.FC<YouTubersModalProps> = ({ onClose, isOpen, isAdmi
         };
         if (isOpen) {
             window.addEventListener('keydown', handleKeyDown);
-            // loadYouTubers();
         }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
-
-    // loadYouTubers removed
 
     const filteredYoutubers = useMemo(() => {
         return youtubers.filter(item => {
@@ -81,7 +89,12 @@ const YouTubersModal: React.FC<YouTubersModalProps> = ({ onClose, isOpen, isAdmi
 
     const handleDeleteClick = async (id: number) => {
         if (window.confirm('Delete channel?')) {
-            setYoutubers(prev => prev.filter(y => y.id !== id));
+            const success = await deleteYouTuber(id);
+            if (success) {
+                setYoutubers(prev => prev.filter(y => y.id !== id));
+            } else {
+                alert('Failed to delete from database');
+            }
         }
     };
 
@@ -92,17 +105,32 @@ const YouTubersModal: React.FC<YouTubersModalProps> = ({ onClose, isOpen, isAdmi
             description: editForm.description,
             category: editForm.category,
             url: editForm.url,
+            // DB expects 'topics' for tags
+            topics: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
+            // Component uses 'tags' for display
             tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
         };
-        if (editForm.id) {
-            setYoutubers(prev => prev.map(y => y.id === editForm.id ? { ...y, ...payload } : y));
+
+        if (editForm.id && typeof editForm.id === 'string' && editForm.id.length > 10) {
+            // Assume real DB ID (uuid/bigint) is likely number or string. 
+            // Local Data uses "1", "2". Seeded data will have BigInt/UUID?
+            // DB id is bigint.
+            // We'll try update.
+            const success = await updateYouTuber(editForm.id, payload);
+            if (success) {
+                loadStartData(); // Reload to get fresh state
+            }
+        } else if (editForm.id) {
+            // It has an ID but might be local? try update anyway.
+            const success = await updateYouTuber(editForm.id, payload);
+            if (success) loadStartData();
         } else {
-            const newChannel = { ...payload, id: Date.now() };
-            setYoutubers(prev => [...prev, newChannel]);
+            // Create
+            const success = await addYouTuber(payload);
+            if (success) loadStartData();
         }
         setIsEditing(false);
     };
-
 
     if (!isOpen) return null;
 

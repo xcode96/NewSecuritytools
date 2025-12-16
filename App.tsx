@@ -204,12 +204,14 @@ const App: React.FC = () => {
     setSelectedTool(null);
   };
 
-  const handleAdminLogin = (status: boolean) => {
-    setIsAdminLoggedIn(status);
-    localStorage.setItem('isAdminLoggedIn', String(status));
-    if (status) {
+  const handleAdminLogin = (user: string, pass: string) => {
+    if (user === 'dqadm' && pass === 'admin') {
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       setShowAdminLogin(false);
+      return true;
     }
+    return false;
   };
 
   const handleEditTool = (tool: Tool) => {

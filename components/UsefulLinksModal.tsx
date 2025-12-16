@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { usefulLinksData, LinkCategory } from '../data/usefulLinks';
+import { usefulLinksData } from '../data/usefulLinks';
 import {
     XMarkIcon,
     LinkIcon,
@@ -12,6 +12,12 @@ import {
     GitHubIcon
 } from './IconComponents';
 import { motion, AnimatePresence } from 'motion/react';
+import {
+    fetchUsefulLinks,
+    addUsefulLink,
+    updateUsefulLink,
+    deleteUsefulLink
+} from '../services/supabaseService';
 
 // Icon Mapping
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -28,10 +34,7 @@ interface UsefulLinksModalProps {
 }
 
 const UsefulLinksModal: React.FC<UsefulLinksModalProps> = ({ onClose, isOpen, isAdmin = false }) => {
-    const [links, setLinks] = useState<any[]>(usefulLinksData.map(d => ({
-        ...d,
-        icon: d.icon_name && ICON_MAP[d.icon_name] ? ICON_MAP[d.icon_name] : (d.icon || <GlobeIcon className="w-6 h-6" />)
-    })));
+    const [links, setLinks] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -46,12 +49,43 @@ const UsefulLinksModal: React.FC<UsefulLinksModalProps> = ({ onClose, isOpen, is
         };
         if (isOpen) {
             window.addEventListener('keydown', handleKeyDown);
-            // loadLinks();
+            loadStartData();
         }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
-    // loadLinks removed
+    const loadStartData = async () => {
+        setIsLoading(true);
+        try {
+            const data = await fetchUsefulLinks();
+            if (data && data.length > 0) {
+                // Map data to include rendered icon
+                const mappedData = data.map(d => ({
+                    ...d,
+                    iconRaw: d.icon, // Keep raw emoji or string
+                    icon: d.icon_name && ICON_MAP[d.icon_name] ? ICON_MAP[d.icon_name] : (d.icon || <GlobeIcon className="w-6 h-6" />)
+                }));
+                setLinks(mappedData);
+            } else {
+                // Fallback to static data if DB is empty
+                setLinks(usefulLinksData.map(d => ({
+                    ...d,
+                    iconRaw: d.icon,
+                    icon: d.icon_name && ICON_MAP[d.icon_name] ? ICON_MAP[d.icon_name] : (d.icon || <GlobeIcon className="w-6 h-6" />)
+                })));
+            }
+        } catch (error) {
+            console.error("Failed to load links", error);
+            // Fallback
+            setLinks(usefulLinksData.map(d => ({
+                ...d,
+                iconRaw: d.icon,
+                icon: d.icon_name && ICON_MAP[d.icon_name] ? ICON_MAP[d.icon_name] : (d.icon || <GlobeIcon className="w-6 h-6" />)
+            })));
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     const filteredLinks = useMemo(() => {
         return links.filter(item => {
@@ -85,14 +119,19 @@ const UsefulLinksModal: React.FC<UsefulLinksModalProps> = ({ onClose, isOpen, is
     const handleEditClick = (item: any) => {
         setEditForm({
             ...item,
-            tags: item.tags.join(', ')
+            tags: Array.isArray(item.tags) ? item.tags.join(', ') : item.tags || ''
         });
         setIsEditing(true);
     };
 
     const handleDeleteClick = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this link?')) {
-            setLinks(prev => prev.filter(l => l.id !== id));
+            const success = await deleteUsefulLink(id);
+            if (success) {
+                loadStartData();
+            } else {
+                alert('Failed to delete link');
+            }
         }
     };
 
@@ -103,15 +142,19 @@ const UsefulLinksModal: React.FC<UsefulLinksModalProps> = ({ onClose, isOpen, is
             url: editForm.url,
             description: editForm.description,
             category: editForm.category,
-            tags: editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
-            icon_name: editForm.icon_name
+            tags: typeof editForm.tags === 'string' ? editForm.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : editForm.tags,
+            icon_name: editForm.icon_name,
+            icon: ICON_MAP[editForm.icon_name] ? undefined : '🌐' // Default emoji if using icon_name, or we could let user input emoji. For now simplifying.
         };
 
         if (editForm.id) {
-            setLinks(prev => prev.map(l => l.id === editForm.id ? { ...l, ...payload, icon: payload.icon_name && ICON_MAP[payload.icon_name] ? ICON_MAP[payload.icon_name] : <GlobeIcon className="w-6 h-6" /> } : l));
+            const success = await updateUsefulLink(editForm.id, payload);
+            if (success) loadStartData();
+            else alert('Failed to update link');
         } else {
-            const newLink = { ...payload, id: Date.now(), icon: payload.icon_name && ICON_MAP[payload.icon_name] ? ICON_MAP[payload.icon_name] : <GlobeIcon className="w-6 h-6" /> };
-            setLinks(prev => [...prev, newLink]);
+            const success = await addUsefulLink(payload);
+            if (success) loadStartData();
+            else alert('Failed to add link');
         }
         setIsEditing(false);
         setEditForm(null);
