@@ -65,18 +65,56 @@ const App: React.FC = () => {
 
   console.log('App component rendering...');
   const [tools, setTools] = useState<Tool[]>(() => {
+    let initialTools: Tool[] = [];
     try {
       const savedTools = localStorage.getItem('tools');
       if (savedTools) {
-        const parsedTools = JSON.parse(savedTools) as Tool[];
+        initialTools = JSON.parse(savedTools) as Tool[];
         // Ensure all saved tools have IDs
-        return parsedTools.map(t => ({ ...t, id: t.id || crypto.randomUUID() }));
+        initialTools = initialTools.map(t => ({ ...t, id: t.id || crypto.randomUUID() }));
       }
     } catch (error) {
       console.error("Failed to parse tools from localStorage:", error);
     }
-    // Fallback to default tools with generated IDs
-    return TOOLS.map(t => ({ ...t, id: crypto.randomUUID() }));
+
+    if (initialTools.length === 0) {
+      return TOOLS.map(t => ({ ...t, id: crypto.randomUUID() }));
+    }
+
+    // Merge strategy: Sync static content (articles) from constants.ts to ensure code updates appear
+    const mergedTools = [...initialTools];
+    let hasChanges = false;
+
+    TOOLS.forEach(staticTool => {
+      const existingIndex = mergedTools.findIndex(t => t.name === staticTool.name);
+
+      if (existingIndex !== -1) {
+        // Tool exists: Sync articles if static version has them
+        // This ensures if you add a guide in code, it shows up
+        if (staticTool.articles && staticTool.articles.length > 0) {
+          const currentArticles = mergedTools[existingIndex].articles || [];
+          // Simple check: if JSON stringify differs, update (or just always update to trust code)
+          // We'll trust code for articles to fix the immediate "New guide not showing" issue
+          if (JSON.stringify(currentArticles) !== JSON.stringify(staticTool.articles)) {
+            mergedTools[existingIndex] = {
+              ...mergedTools[existingIndex],
+              articles: staticTool.articles
+            };
+            hasChanges = true;
+          }
+        }
+      } else {
+        // Tool new in code: Add it
+        mergedTools.push({ ...staticTool, id: crypto.randomUUID() });
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      console.log("Merged static tools into local state");
+    }
+
+    return mergedTools;
   });
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [editingTool, setEditingTool] = useState<Tool | null>(null);
@@ -247,10 +285,25 @@ const App: React.FC = () => {
     }
   }, [tools]);
 
+  // Keep selectedTool in sync with tools array
+  useEffect(() => {
+    if (selectedTool) {
+      const updatedTool = tools.find(t => t.id === selectedTool.id);
+      if (updatedTool && JSON.stringify(updatedTool) !== JSON.stringify(selectedTool)) {
+        console.log('🔄 Syncing selectedTool:', selectedTool.name);
+        console.log('🔄 Old articles count:', selectedTool.articles?.length || 0);
+        console.log('🔄 New articles count:', updatedTool.articles?.length || 0);
+        setSelectedTool(updatedTool);
+        console.log('✅ selectedTool synced');
+      }
+    }
+  }, [tools, selectedTool]);
+
   // Persist Categories
   useEffect(() => {
     localStorage.setItem('categories', JSON.stringify(categories));
   }, [categories]);
+
 
   const handleDeleteTool = async (toolId: string) => {
     const tool = tools.find(t => t.id === toolId);
@@ -274,14 +327,26 @@ const App: React.FC = () => {
   };
 
   const handleSaveArticle = async (toolName: string, articles: SubArticle[]) => {
+    console.log('🔵 handleSaveArticle called for:', toolName);
+    console.log('🔵 New articles array:', articles);
+
     const toolToUpdate = tools.find(t => t.name === toolName);
-    if (!toolToUpdate) return;
+    if (!toolToUpdate) {
+      console.error('❌ Tool not found:', toolName);
+      return;
+    }
 
     const updatedToolObj: Tool = { ...toolToUpdate, articles };
+    console.log('🔵 Updated tool object:', updatedToolObj);
+
     setTools(prev => prev.map(t => t.id === toolToUpdate.id ? updatedToolObj : t));
+    console.log('✅ Tools array updated');
 
     setArticleEditorState(null);
+    console.log('✅ Article editor closed');
+
     setSelectedTool(updatedToolObj);
+    console.log('✅ Selected tool set to:', updatedToolObj.name, 'with', updatedToolObj.articles?.length, 'articles');
   };
 
 

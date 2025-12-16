@@ -185,12 +185,21 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
 
     if (error) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-full mb-4">
+        <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+          <div className="bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-full">
             <XMarkIcon className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-slate-800 dark:text-white">Failed to load details</h3>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm">{error}</p>
+          <p className="text-slate-500 dark:text-slate-400 max-w-sm">{error}</p>
+          {isAdmin && (
+            <button
+              onClick={() => onEditArticle('add', tool, undefined)}
+              className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-lg transition-all mt-4"
+            >
+              <PlusIcon className="w-4 h-4" />
+              <span>Create First Guide</span>
+            </button>
+          )}
         </div>
       );
     }
@@ -202,6 +211,18 @@ const ToolDetailModal: React.FC<ToolDetailModalProps> = ({
           animate={{ opacity: 1 }}
           className="space-y-8 pb-10"
         >
+          {isAdmin && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => onEditArticle('add', tool, undefined)}
+                className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 shadow-lg hover:shadow-xl transition-all"
+              >
+                <PlusIcon className="w-3 h-3" />
+                <span>New Guide</span>
+              </button>
+            </div>
+          )}
+
           <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 dark:border-white/5 shadow-sm">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-500 rounded-full" />
