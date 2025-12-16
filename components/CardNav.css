@@ -1,0 +1,202 @@
+.card-nav-container {
+    width: 100%;
+    position: absolute;
+    /* Floating over content */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: 'Inter', sans-serif;
+    pointer-events: none;
+    /* Let clicks pass through when closed */
+}
+
+.card-nav {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: height 0.4s ease, background-color 0.4s ease;
+    border-bottom: none;
+    /* Removed border */
+}
+
+/* Only show background when open */
+.card-nav:not(.open) {
+    background-color: transparent !important;
+}
+
+.card-nav.open {
+    pointer-events: auto;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-nav-top {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: relative;
+    z-index: 20;
+    pointer-events: auto;
+    /* Buttons must be clickable */
+}
+
+/* Hamburger */
+.hamburger-menu {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.hamburger-menu:hover {
+    opacity: 0.7;
+}
+
+.hamburger-line {
+    width: 24px;
+    height: 2px;
+    background-color: currentColor;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-menu.open .hamburger-line:nth-child(2) {
+    transform: translateY(0) rotate(-45deg);
+    /* Adjusted logic for 2-line standard or add 3rd if needed, code had 2 divs */
+    /* Wait, code shows 2 lines. Usually hamburger is 3, but 2 can work for close 'X' */
+    /* Re-reading code: it has exactly 2 divs */
+}
+
+/* Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* CTA Button */
+.card-nav-cta-button {
+    padding: 8px 16px;
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.card-nav-cta-button:hover {
+    transform: scale(1.05);
+}
+
+/* Expanded Content */
+.card-nav-content {
+    display: flex;
+    /* Use flex instead of grid for single column */
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    /* Constrain width for a nicer list look */
+    margin: 0 auto;
+    /* Center horizontally */
+    padding: 24px;
+    padding-top: 10px;
+    opacity: 0;
+    /* Handled by GSAP */
+    transform: translateY(50px);
+    /* Handled by GSAP */
+}
+
+/* Nav Cards */
+.nav-card {
+    border-radius: 16px;
+    padding: 12px;
+    /* Reduced from 24px */
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    /* Allow auto height */
+    /* Remove hover transform for flat list feel, or keep it subtle */
+}
+
+.nav-card-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.nav-card-label:empty {
+    display: none;
+    margin-bottom: 0;
+}
+
+.nav-card-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-card-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    /* Slightly smaller for density if needed */
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+    opacity: 0.8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.nav-card-link:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Slight highlight on hover */
+    padding-left: 12px;
+    /* Reset padding shift or keep it */
+}
+
+.nav-card-link-icon {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s;
+}
+
+.nav-card-link:hover .nav-card-link-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .card-nav-content {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .nav-card {
+        min-height: auto;
+        padding: 20px;
+    }
+}

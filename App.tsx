@@ -301,7 +301,11 @@ const App: React.FC = () => {
 
   // Persist Categories
   useEffect(() => {
-    localStorage.setItem('categories', JSON.stringify(categories));
+    try {
+      localStorage.setItem('categories', JSON.stringify(categories));
+    } catch (error) {
+      console.error("Failed to save categories to localStorage:", error);
+    }
   }, [categories]);
 
 
@@ -469,14 +473,20 @@ const App: React.FC = () => {
     return null;
   }
 
+
+
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300`}>
-      {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
         categories={categories}
         activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
+        onSelectCategory={(cat) => {
+          setActiveCategory(cat);
+          setSearchQuery(''); // Clear search when switching category
+          setIsSidebarOpen(false); // Close mobile sidebar on selection
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
@@ -484,6 +494,7 @@ const App: React.FC = () => {
 
         <main className="flex-1 container mx-auto px-4 pb-32 pt-32">
           {activeCategory === 'Cheatsheets' ? (
+            // ... rest of main content ...
             <Cheatsheets />
           ) : (
             /* Tool Grid */

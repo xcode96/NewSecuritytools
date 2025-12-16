@@ -101,6 +101,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
                     absolute top-4 right-4 p-2 rounded-full 
                     bg-black/20 backdrop-blur-md border border-white/10
                     hover:bg-white/20 transition-all z-20
+                    opacity-0 group-hover:opacity-100
                     ${isFavorite ? 'text-red-500' : 'text-white/60 hover:text-white'}
                 `}
           >
