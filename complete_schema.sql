@@ -174,3 +174,14 @@ create policy "Public Access" on public.downloads for all using (true) with chec
 create policy "Public Access" on public.frameworks for all using (true) with check (true);
 create policy "Public Access" on public.breach_services for all using (true) with check (true);
 create policy "Public Access" on public.youtubers for all using (true) with check (true);
+
+-- 11. Admin Users Table
+create table if not exists public.admin_users (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users(id) not null unique,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- RLS for Admin Users
+alter table public.admin_users enable row level security;
+create policy "Allow read for authenticated users" on public.admin_users for select using (auth.uid() = user_id);

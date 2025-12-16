@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { categoryInfo } from './data/tools';
 import {
   fetchTools, addTool, updateTool, deleteTool,
-  fetchCategories, addCategory, updateCategory, deleteCategory
+  fetchCategories, addCategory, updateCategory, deleteCategory,
+  fetchBreachServices, addBreachService, updateBreachService, deleteBreachService
 } from './services/supabaseService';
 import { ToolCard } from './components/ToolCard';
 import ToolDetailModal from './components/ToolDetailModal';
@@ -27,7 +28,7 @@ import { Cheatsheets } from './components/Cheatsheets';
 
 import type { Tool, GeneratedToolDetails, ToolFormData, SubArticle, CategoryInfo, UserProfile } from './types';
 import { TOOLS } from './data/constants';
-import { signInWithGoogle, signOut as authSignOut, getUserProfile, onAuthStateChange, getSession } from './services/authService';
+import { signInWithGoogle, signOut as authSignOut, getUserProfile, onAuthStateChange, getSession, signInWithEmail, isAdmin, signOut } from './services/authService';
 import { UserAuthButton } from './components/UserAuthButton';
 import { ToolSubmissionModal } from './components/ToolSubmissionModal';
 import { ToolFormModal } from './components/ToolFormModal';
@@ -204,14 +205,36 @@ const App: React.FC = () => {
     setSelectedTool(null);
   };
 
-  const handleAdminLogin = (user: string, pass: string) => {
-    if (user === 'dqadm' && pass === 'admin') {
-      setIsAdminLoggedIn(true);
-      localStorage.setItem('isAdminLoggedIn', 'true');
-      setShowAdminLogin(false);
-      return true;
+  const handleAdminLogin = async (username: string, pass: string) => {
+    // Map dqadm to the secure email
+    let email = username;
+    if (username === 'dqadm') {
+      email = 'dqadm@admin.com';
     }
-    return false;
+
+    try {
+      const { data, error } = await signInWithEmail(email, pass);
+
+      if (error || !data.user) {
+        console.error("Login failed:", error);
+        return false;
+      }
+
+      // Check if the user is actually an admin
+      const adminStatus = await isAdmin();
+      if (adminStatus) {
+        setIsAdminLoggedIn(true);
+        setShowAdminLogin(false);
+        return true;
+      } else {
+        // User logged in but not an admin
+        await signOut();
+        return false;
+      }
+    } catch (err) {
+      console.error("Unexpected login error:", err);
+      return false;
+    }
   };
 
   const handleEditTool = (tool: Tool) => {
@@ -452,7 +475,7 @@ const App: React.FC = () => {
 
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300`}>
+    <div className={`min - h - screen flex flex - col transition - colors duration - 300`}>
       <Sidebar
         isOpen={isSidebarOpen}
         categories={categories}

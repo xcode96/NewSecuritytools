@@ -8,6 +8,29 @@ export interface UserProfile {
     avatarUrl: string | null;
 }
 
+
+/**
+ * Sign in with Email and Password
+ */
+export const signInWithEmail = async (email: string, password: string): Promise<{ data: any, error: Error | null }> => {
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            console.error('Error signing in with email:', error);
+            return { data: null, error };
+        }
+
+        return { data, error: null };
+    } catch (err) {
+        console.error('Unexpected error during email sign-in:', err);
+        return { data: null, error: err as Error };
+    }
+};
+
 /**
  * Sign in with Google OAuth
  */
