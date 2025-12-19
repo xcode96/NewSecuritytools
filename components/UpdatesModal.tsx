@@ -9,7 +9,24 @@ import {
     NewspaperIcon,
     WarningTriangleIcon,
     BugIcon,
-    FrameworkIcon
+    FrameworkIcon,
+    NistIcon,
+    MicrosoftIcon,
+    GoogleIcon,
+    AppleIcon,
+    AdobeIcon,
+    OracleIcon,
+    MozillaIcon,
+    UbuntuIcon,
+    RedHatIcon,
+    DebianIcon,
+    SuseIcon,
+    CisaIcon,
+    Rapid7Icon,
+    TenableIcon,
+    QualysIcon,
+    MitreIcon,
+    LinuxIcon
 } from './IconComponents';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -40,6 +57,33 @@ const UpdatesModal: React.FC<UpdatesModalProps> = ({ onClose, isOpen }) => {
             feed.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [searchQuery]);
+
+    const getSourceIcon = (code: string) => {
+        switch (code) {
+            case 'NVD': return <NistIcon className="w-6 h-6 text-blue-600" />;
+            case 'CVED':
+            case 'CWE': return <MitreIcon className="w-6 h-6 text-blue-700" />;
+            case 'EDB': return <BugIcon className="w-6 h-6 text-red-600" />;
+            case 'MSRC':
+            case 'WUH':
+            case 'PTD': return <MicrosoftIcon className="w-6 h-6" />;
+            case 'APSB': return <AdobeIcon className="w-6 h-6 text-red-600" />;
+            case 'CPU': return <OracleIcon className="w-6 h-6 text-red-600" />;
+            case 'GCR':
+            case 'ASB': return <GoogleIcon className="w-6 h-6" />;
+            case 'MFSA': return <MozillaIcon className="w-6 h-6" />;
+            case 'USN': return <UbuntuIcon className="w-6 h-6 text-orange-600" />;
+            case 'RHSA': return <RedHatIcon className="w-6 h-6 text-red-600" />;
+            case 'DSA': return <DebianIcon className="w-6 h-6 text-pink-700" />;
+            case 'SUSE-SU': return <SuseIcon className="w-6 h-6 text-green-600" />;
+            case 'KEV': return <CisaIcon className="w-6 h-6 text-blue-800" />;
+            case 'R7VED': return <Rapid7Icon className="w-6 h-6 text-orange-500" />;
+            case 'TSF': return <TenableIcon className="w-6 h-6 text-blue-900" />;
+            case 'QVTP': return <QualysIcon className="w-6 h-6 text-blue-500" />;
+            case 'ASU': return <AppleIcon className="w-6 h-6" />;
+            default: return <DatabaseIcon className="w-6 h-6 text-slate-500" />;
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -123,7 +167,7 @@ const UpdatesModal: React.FC<UpdatesModalProps> = ({ onClose, isOpen }) => {
                                 placeholder={activeTab === 'sources' ? "Search updates..." : "Search feeds..."}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border-none text-sm focus:ring-2 focus:ring-blue-500"
+                                className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-100 dark:bg-white/5 border-none text-sm focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
                             />
                         </div>
                     </div>
@@ -132,22 +176,30 @@ const UpdatesModal: React.FC<UpdatesModalProps> = ({ onClose, isOpen }) => {
                     {activeTab === 'sources' && !searchQuery && activeCategory === 'All' && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center text-center">
-                                <span className="text-3xl mb-2">🏛️</span>
+                                <div className="mb-2">
+                                    <NistIcon className="w-8 h-8 text-blue-600" />
+                                </div>
                                 <span className="text-lg font-bold dark:text-white">NVD</span>
                                 <span className="text-xs text-slate-500">Real-time CVEs</span>
                             </div>
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center text-center">
-                                <span className="text-3xl mb-2">🔍</span>
+                                <div className="mb-2">
+                                    <MicrosoftIcon className="w-8 h-8" />
+                                </div>
                                 <span className="text-lg font-bold dark:text-white">MSRC</span>
                                 <span className="text-xs text-slate-500">Patch Tuesday</span>
                             </div>
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center text-center">
-                                <span className="text-3xl mb-2">🚨</span>
+                                <div className="mb-2">
+                                    <CisaIcon className="w-8 h-8 text-blue-800" />
+                                </div>
                                 <span className="text-lg font-bold dark:text-white">CISA KEV</span>
                                 <span className="text-xs text-slate-500">Exploited CVEs</span>
                             </div>
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center text-center">
-                                <span className="text-3xl mb-2">💥</span>
+                                <div className="mb-2">
+                                    <BugIcon className="w-8 h-8 text-red-600" />
+                                </div>
                                 <span className="text-lg font-bold dark:text-white">Exploit-DB</span>
                                 <span className="text-xs text-slate-500">Daily Exploits</span>
                             </div>
@@ -172,8 +224,8 @@ const UpdatesModal: React.FC<UpdatesModalProps> = ({ onClose, isOpen }) => {
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold shrink-0">
-                                                    {item.code}
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center shrink-0 p-1.5">
+                                                    {getSourceIcon(item.code || '')}
                                                 </div>
                                                 <div>
                                                     <h3 className="font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-500 transition-colors">{item.name}</h3>
@@ -212,7 +264,7 @@ const UpdatesModal: React.FC<UpdatesModalProps> = ({ onClose, isOpen }) => {
                                         </div>
 
                                         <a href={item.url} target="_blank" rel="noopener noreferrer" className="mt-auto block w-full py-2.5 rounded-xl bg-slate-50 dark:bg-white/5 text-center text-sm font-bold text-slate-600 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center gap-2">
-                                            Visit Site <GlobeIcon className="w-4 h-4 opacity-50" />
+                                            Official Website <GlobeIcon className="w-4 h-4" />
                                         </a>
                                     </motion.div>
                                 ))}
