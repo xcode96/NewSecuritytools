@@ -28,20 +28,18 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
     const loadStartData = async () => {
         const data = await fetchDownloads();
         if (data && data.length > 0) {
-            // Map DB fields to Component fields
-            // DB: code, type, team, popularity, key_features(text[]), size, version, os(text[])
-            // Component: code, type, team, popularity, keyFeatures, size, format?, author?
-            // Note: `format` and `author` were in the edit form but not explicitly in `DownloadItem` interface in `data/downloads.ts`?
-            // Actually `DownloadItem` has: id, name, code, type, category, team, description, popularity, keyFeatures, link.
-            // It DOES NOT have `format`, `size`, `author`.
-            // But the UI `editForm` was using them. 
-            // In the DB I added `code`, `type`, `team`, `popularity`, `key_features`.
-            // `size` exists in DB.
-            const mapped = data.map((item: any) => ({
-                ...item,
-                keyFeatures: item.key_features || item.os, // Fallback
-                link: item.url
-            }));
+            // Map DB fields to Component fields and merge with static data for missing URLs
+            const mapped = data.map((item: any) => {
+                const staticItem = downloadsData.find(d => d.name === item.name);
+                const resolvedUrl = item.url || item.link || staticItem?.url || '';
+
+                return {
+                    ...item,
+                    keyFeatures: item.key_features || item.os || staticItem?.keyFeatures,
+                    link: resolvedUrl,
+                    url: resolvedUrl
+                };
+            });
             setDownloads(mapped);
         } else {
             setDownloads(downloadsData);
@@ -80,7 +78,7 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
     const handleEditClick = (item: any) => {
         setEditForm({
             ...item,
-            tags: Array.isArray(item.tags) ? item.tags.join(', ') : item.tags || ''
+            tags: Array.isArray(item.tags) ? item.tags.join(', ') : (item.tags || '')
         });
         setIsEditing(true);
     };
@@ -212,7 +210,7 @@ const DownloadsModal: React.FC<DownloadsModalProps> = ({ onClose, isOpen, isAdmi
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-500 transition-colors">{item.name}</h3>
                                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{item.description}</p>
-                                <a href={item.url} className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-bold group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 text-sm font-bold group-hover:bg-emerald-600 group-hover:text-white transition-all">
                                     <DownloadIcon className="w-4 h-4" /> Download
                                 </a>
                             </motion.div>

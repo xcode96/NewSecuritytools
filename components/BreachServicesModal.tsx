@@ -47,7 +47,17 @@ const BreachServicesModal: React.FC<BreachServicesModalProps> = ({ isOpen, onClo
         try {
             const data = await fetchBreachServices();
             if (data && data.length > 0) {
-                setServices(data as unknown as BreachService[]);
+                // @ts-ignore
+                const mapped = data.map(item => {
+                    const staticItem = staticBreachServices.find(s => s.name === item.name);
+                    const resolvedUrl = item.url || item.link || staticItem?.url || '';
+                    return {
+                        ...item,
+                        url: resolvedUrl,
+                        link: resolvedUrl
+                    };
+                });
+                setServices(mapped);
             } else {
                 const mappedStatic = staticBreachServices.map(s => ({
                     ...s,
@@ -368,7 +378,7 @@ const BreachServicesModal: React.FC<BreachServicesModalProps> = ({ isOpen, onClo
                                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tags (comma separated)</label>
                                     <input
                                         type="text"
-                                        value={editingService.tags.join(', ')}
+                                        value={(editingService.tags || []).join(', ')}
                                         onChange={e => setEditingService({ ...editingService, tags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                                         className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                         placeholder="tag1, tag2, tag3"
@@ -379,7 +389,7 @@ const BreachServicesModal: React.FC<BreachServicesModalProps> = ({ isOpen, onClo
                                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Key Features (comma separated)</label>
                                     <input
                                         type="text"
-                                        value={editingService.key_features.join(', ')}
+                                        value={(editingService.key_features || []).join(', ')}
                                         onChange={e => setEditingService({ ...editingService, key_features: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
                                         className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                         placeholder="Feature 1, Feature 2"

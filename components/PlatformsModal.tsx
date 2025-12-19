@@ -28,15 +28,18 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
     const loadStartData = async () => {
         const data = await fetchPlatforms();
         if (data && data.length > 0) {
-            // Map DB fields
-            // DB: name, description, url, features(text[]), type, pricing_model
-            // New Cols: rating, founded, hackers, notable_companies(text[])
-            const mapped = data.map((item: any) => ({
-                ...item,
-                payoutRange: item.pricing_model,
-                notableCompanies: item.notable_companies,
-                // features is already array (hopefully)
-            }));
+            const mapped = data.map((item: any) => {
+                const staticItem = platformsData.find(p => p.name === item.name);
+                const resolvedUrl = item.url || item.link || staticItem?.url || '';
+
+                return {
+                    ...item,
+                    payoutRange: item.pricing_model,
+                    notableCompanies: item.notable_companies,
+                    url: resolvedUrl,
+                    link: resolvedUrl
+                };
+            });
             setPlatforms(mapped);
         } else {
             setPlatforms(platformsData);
@@ -84,8 +87,8 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
     const handleEditClick = (item: any) => {
         setEditForm({
             ...item,
-            tags: Array.isArray(item.tags) ? item.tags.join(', ') : item.tags || '',
-            features: Array.isArray(item.features) ? item.features.join('\n') : item.features || ''
+            tags: Array.isArray(item.tags) ? item.tags.join(', ') : (item.tags || ''),
+            features: Array.isArray(item.features) ? item.features.join('\n') : (item.features || '')
         });
         setIsEditing(true);
     };
