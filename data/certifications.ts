@@ -41,7 +41,7 @@ export const certificationsData: Certification[] = [
         examFormat: '24-hour practical exam + 24-hour report',
         keySkills: ['Penetration Testing', 'Exploitation', 'Report Writing', 'Linux', 'Windows'],
         careerPaths: ['Penetration Tester', 'Security Consultant', 'Red Team Operator'],
-        link: 'https://www.offsec.com/'
+        link: 'https://www.offsec.com/courses/pen-200/'
     },
     {
         id: '2',
@@ -61,7 +61,7 @@ export const certificationsData: Certification[] = [
         examFormat: '48-hour practical exam + 24-hour report',
         keySkills: ['Evasion Techniques', 'Advanced Exploitation', 'AV Bypass', 'Lateral Movement'],
         careerPaths: ['Senior Penetration Tester', 'Red Team Lead', 'Security Researcher'],
-        link: 'https://www.offsec.com/'
+        link: 'https://www.offsec.com/courses/pen-300/'
     },
     {
         id: '3',
@@ -81,7 +81,7 @@ export const certificationsData: Certification[] = [
         examFormat: '48-hour practical exam + 24-hour report',
         keySkills: ['Web Application Security', 'Source Code Review', 'Custom Exploits'],
         careerPaths: ['Web Application Penetration Tester', 'Security Researcher'],
-        link: 'https://www.offsec.com/'
+        link: 'https://www.offsec.com/courses/web-300/'
     },
     {
         id: '4',
@@ -101,7 +101,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour multiple choice exam',
         keySkills: ['Ethical Hacking', 'Vulnerability Assessment', 'Basic Penetration Testing'],
         careerPaths: ['Junior Penetration Tester', 'Security Analyst'],
-        link: 'https://www.eccouncil.org/'
+        link: 'https://www.eccouncil.org/programs/certified-ethical-hacker-ceh/'
     },
     {
         id: '5',
@@ -121,7 +121,7 @@ export const certificationsData: Certification[] = [
         examFormat: '24-hour practical exam',
         keySkills: ['Active Directory', 'Lateral Movement', 'Privilege Escalation'],
         careerPaths: ['Red Team Operator', 'Penetration Tester'],
-        link: 'https://www.elearnsecurity.com/'
+        link: 'https://www.alteredsecurity.com/adlab'
     },
     {
         id: '6',
@@ -141,7 +141,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour proctored exam',
         keySkills: ['Penetration Testing', 'Vulnerability Assessment', 'Network Security'],
         careerPaths: ['Penetration Tester', 'Security Consultant'],
-        link: 'https://www.giac.org/'
+        link: 'https://www.giac.org/certifications/penetration-tester-gpen/'
     },
     {
         id: '7',
@@ -161,7 +161,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour proctored exam',
         keySkills: ['Incident Response', 'Digital Forensics', 'Malware Analysis'],
         careerPaths: ['Incident Response Analyst', 'SOC Analyst', 'Digital Forensics Examiner'],
-        link: 'https://www.giac.org/'
+        link: 'https://www.giac.org/certifications/certified-incident-handler-gcih/'
     },
     {
         id: '8',
@@ -181,7 +181,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour proctored exam',
         keySkills: ['Digital Forensics', 'Memory Analysis', 'Timeline Analysis'],
         careerPaths: ['Digital Forensics Examiner', 'Incident Response Lead'],
-        link: 'https://www.giac.org/'
+        link: 'https://www.giac.org/certifications/certified-forensic-analyst-gcfa/'
     },
     {
         id: '9',
@@ -201,7 +201,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour proctored exam',
         keySkills: ['Security Fundamentals', 'Risk Management', 'Network Security'],
         careerPaths: ['Security Analyst', 'SOC Analyst', 'Security Consultant'],
-        link: 'https://www.giac.org/'
+        link: 'https://www.giac.org/certifications/security-essentials-gsec/'
     },
     {
         id: '10',
@@ -221,7 +221,7 @@ export const certificationsData: Certification[] = [
         examFormat: '4-hour proctored exam',
         keySkills: ['Network Forensics', 'Traffic Analysis', 'Intrusion Detection'],
         careerPaths: ['Network Security Analyst', 'Digital Forensics Examiner'],
-        link: 'https://www.giac.org/'
+        link: 'https://www.giac.org/certifications/network-forensic-analyst-gnfa/'
     },
     {
         id: '11',
@@ -241,7 +241,7 @@ export const certificationsData: Certification[] = [
         examFormat: '165 questions, 165 minutes',
         keySkills: ['Threat Analysis', 'Vulnerability Assessment', 'Incident Response'],
         careerPaths: ['SOC Analyst', 'Cybersecurity Analyst', 'Threat Hunter'],
-        link: 'https://www.comptia.org/'
+        link: 'https://www.comptia.org/certifications/cybersecurity-analyst'
     },
     {
         id: '12',
@@ -301,6 +301,6 @@ export const certificationsData: Certification[] = [
         examFormat: '150 questions, 4 hours',
         keySkills: ['Security Management', 'Governance', 'Risk Management'],
         careerPaths: ['Security Manager', 'CISO', 'Security Consultant'],
-        link: '#'
+        link: 'https://www.isaca.org/credentialing/cism'
     }
 ];

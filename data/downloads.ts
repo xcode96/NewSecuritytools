@@ -15,7 +15,7 @@ export interface DownloadItem {
     description: string;
     popularity: number; // percentage
     keyFeatures: string[];
-    link: string;
+    url: string;
 }
 
 export const downloadsData: DownloadItem[] = [
@@ -27,87 +27,133 @@ export const downloadsData: DownloadItem[] = [
         type: 'ISO',
         category: 'Linux Security Distributions',
         team: 'Red Team',
-        description: 'Advanced penetration testing and security auditing Linux distribution.',
-        popularity: 95,
-        keyFeatures: ['600+ Security Tools', 'Metasploit Framework', 'Burp Suite', 'Nmap', 'Wireshark'],
-        link: 'https://www.kali.org/get-kali/'
+        description: 'Advanced Penetration Testing Distribution',
+        url: 'https://www.kali.org/get-kali/',
+        popularity: 5,
+        keyFeatures: ['600+ Tools', 'Rolling Release', 'Wide Support']
     },
     {
         id: '2',
-        name: 'Parrot Security OS',
-        code: 'Parrot Security OS',
-        type: 'ISO',
+        name: 'Parrot OS',
+        code: 'Parrot OS',
+        description: 'Security-oriented operating system focused on Pentesting and Privacy',
+        link: 'https://parrotsec.org/download/',
         category: 'Linux Security Distributions',
+        type: 'ISO',
         team: 'Red Team',
-        description: 'Security-oriented operating system designed for penetration testing, digital forensics, and privacy protection.',
-        popularity: 85,
-        keyFeatures: ['Lightweight', 'Privacy Tools', 'Pentesting Suite', 'Forensics Tools', 'Cryptography'],
-        link: 'https://parrotsec.org/download/'
+        popularity: 4.5,
+        keyFeatures: ['Lightweight', 'Privacy Focused', 'Dev Tools']
     },
     {
         id: '3',
-        name: 'BlackArch Linux',
-        code: 'BlackArch Linux',
-        type: 'ISO',
+        name: 'Tails',
+        code: 'Tails',
+        description: 'The Amnesic Incognito Live System used to preserve privacy and anonymity',
+        link: 'https://tails.boum.org/install/',
         category: 'Linux Security Distributions',
+        type: 'ISO',
         team: 'Red Team',
-        description: 'Arch Linux-based penetration testing distribution with over 2800 tools.',
-        popularity: 75,
-        keyFeatures: ['2800+ Tools', 'Rolling Release', 'Lightweight', 'Modular', 'Arch-based'],
-        link: 'https://blackarch.org/downloads.html'
+        popularity: 4.5,
+        keyFeatures: ['Anonymity', 'Tor Integrated', 'Amnezia']
     },
     {
         id: '4',
-        name: 'Pentoo Linux',
-        code: 'Pentoo Linux',
-        type: 'ISO',
+        name: 'BlackArch',
+        code: 'BlackArch',
+        description: 'Arch Linux-based penetration testing distribution',
+        link: 'https://blackarch.org/downloads.html',
         category: 'Linux Security Distributions',
+        type: 'ISO',
         team: 'Red Team',
-        description: 'Gentoo-based security-focused Linux distribution for penetration testing.',
-        popularity: 65,
-        keyFeatures: ['Hardened Kernel', 'GRSEC/PaX', 'Custom Tools', 'Live Boot', 'Persistence'],
-        link: 'https://pentoo.ch/downloads/'
+        popularity: 4,
+        keyFeatures: ['2800+ Tools', 'Modular', 'Arch Based']
     },
-    // Digital Forensics
     {
         id: '5',
-        name: 'CAINE Linux',
-        code: 'CAINE Linux',
-        type: 'ISO',
+        name: 'SIFT Workstation',
+        code: 'SIFT Workstation',
+        description: 'SANS Investigative Forensic Toolkit',
+        link: 'https://www.sans.org/tools/sift-workstation/',
         category: 'Digital Forensics',
+        type: 'VM',
         team: 'Blue Team',
-        description: 'Computer Aided INvestigative Environment for digital forensics.',
-        popularity: 80,
-        keyFeatures: ['Autopsy', 'Sleuth Kit', 'PhotoRec', 'Volatility', 'Wireshark'],
-        link: 'https://www.caine-live.net/'
+        popularity: 5,
+        keyFeatures: ['Forensics', 'Incident Response', 'Free']
     },
     {
         id: '6',
-        name: 'DEFT Linux',
-        code: 'DEFT Linux',
-        type: 'ISO',
+        name: 'Autopsy',
+        code: 'Autopsy',
+        description: 'Digital Forensics Platform',
+        link: 'https://www.autopsy.com/download/',
         category: 'Digital Forensics',
+        type: 'Installer',
         team: 'Blue Team',
-        description: 'Digital Evidence & Forensics Toolkit for incident response and digital forensics.',
-        popularity: 70,
-        keyFeatures: ['DART', 'Mobile Forensics', 'Network Analysis', 'Memory Dump', 'Hash Tools'],
-        link: 'http://www.deftlinux.net/'
+        popularity: 4.5,
+        keyFeatures: ['User Friendly', 'Analysis', 'Reporting']
     },
     {
         id: '7',
-        name: 'PALADIN',
-        code: 'PALADIN',
-        type: 'ISO',
-        category: 'Digital Forensics',
+        name: 'Wireshark',
+        code: 'Wireshark',
+        description: 'Network Protocol Analyzer',
+        link: 'https://www.wireshark.org/download.html',
+        category: 'Specialized Tools',
+        type: 'Installer',
         team: 'Blue Team',
-        description: 'Linux-based forensic suite with a focus on simplicity and ease of use.',
-        popularity: 75,
-        keyFeatures: ['User-Friendly', 'Write Blocking', 'Imaging Tools', 'Analysis Suite', 'Reporting'],
-        link: 'https://sumuri.com/software/paladin/'
+        popularity: 5,
+        keyFeatures: ['Packet Analysis', 'Deep Inspection', 'Multi-Platform']
     },
-    // Windows Security Tools
     {
         id: '8',
+        name: 'Nmap',
+        code: 'Nmap',
+        description: 'Network Mapper',
+        link: 'https://nmap.org/download.html',
+        category: 'Specialized Tools',
+        type: 'Installer',
+        team: 'Red Team',
+        popularity: 5,
+        keyFeatures: ['Network Discovery', 'Security Auditing', 'Scriptable']
+    },
+    {
+        id: '9',
+        name: 'Burp Suite Community',
+        code: 'Burp Suite',
+        description: 'Web Application Security Testing',
+        link: 'https://portswigger.net/burp/communitydownload',
+        category: 'Specialized Tools',
+        type: 'Installer',
+        team: 'Red Team',
+        popularity: 5,
+        keyFeatures: ['Web Proxy', 'Scanner', 'Repeater']
+    },
+    {
+        id: '10',
+        name: 'Ghidra',
+        code: 'Ghidra',
+        description: 'Software Reverse Engineering Suite',
+        link: 'https://ghidra-sre.org/',
+        category: 'Specialized Tools',
+        type: 'ZIP',
+        team: 'Red Team',
+        popularity: 4.5,
+        keyFeatures: ['Decompiler', 'Multi-Arch', 'Scriptable']
+    },
+    {
+        id: '11',
+        name: 'Metasploit Framework',
+        code: 'Metasploit',
+        description: 'Penetration Testing Framework',
+        link: 'https://www.metasploit.com/download',
+        category: 'Specialized Tools',
+        type: 'Installer',
+        team: 'Red Team',
+        popularity: 5,
+        keyFeatures: ['Exploitation', 'Payloads', 'Evading']
+    },
+    {
+        id: '12',
         name: 'Windows 11 Enterprise',
         code: 'WIN',
         type: 'ISO',
@@ -119,7 +165,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-enterprise'
     },
     {
-        id: '9',
+        id: '13',
         name: 'Windows Server 2022',
         code: 'WIN',
         type: 'ISO',
@@ -132,7 +178,7 @@ export const downloadsData: DownloadItem[] = [
     },
     // Ubuntu & Debian
     {
-        id: '10',
+        id: '14',
         name: 'Ubuntu Server LTS',
         code: 'Ubuntu Server LTS',
         type: 'ISO',
@@ -144,7 +190,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://ubuntu.com/download/server'
     },
     {
-        id: '11',
+        id: '15',
         name: 'Ubuntu Desktop LTS',
         code: 'Ubuntu Desktop LTS',
         type: 'ISO',
@@ -156,7 +202,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://ubuntu.com/download/desktop'
     },
     {
-        id: '12',
+        id: '16',
         name: 'Debian Security',
         code: 'Debian Security',
         type: 'ISO',
@@ -169,7 +215,7 @@ export const downloadsData: DownloadItem[] = [
     },
     // Specialized Tools
     {
-        id: '13',
+        id: '17',
         name: 'pfSense',
         code: 'pfSense',
         type: 'ISO',
@@ -181,7 +227,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://shop.netgate.com/products/netgate-installer'
     },
     {
-        id: '14',
+        id: '18',
         name: 'Security Onion',
         code: 'Security Onion',
         type: 'ISO',
@@ -193,19 +239,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://securityonionsolutions.com/software/'
     },
     {
-        id: '15',
-        name: 'SIFT Workstation',
-        code: 'SIFT Workstation',
-        type: 'ISO',
-        category: 'Specialized Tools',
-        team: 'Blue Team',
-        description: 'SANS Investigative Forensic Toolkit for digital forensics and incident response.',
-        popularity: 85,
-        keyFeatures: ['Timeline Analysis', 'Memory Analysis', 'File Analysis', 'Network Analysis', 'Registry Analysis'],
-        link: 'https://www.sans.org/tools/sift-workstation/'
-    },
-    {
-        id: '16',
+        id: '19',
         name: 'REMnux',
         code: 'REMnux',
         type: 'ISO',
@@ -218,7 +252,7 @@ export const downloadsData: DownloadItem[] = [
     },
     // Development Tools
     {
-        id: '17',
+        id: '20',
         name: 'Node.js LTS',
         code: 'Node.js LTS',
         type: 'Tool',
@@ -230,7 +264,7 @@ export const downloadsData: DownloadItem[] = [
         link: 'https://nodejs.org/en/download'
     },
     {
-        id: '18',
+        id: '21',
         name: 'Python Security',
         code: 'Python Security',
         type: 'Tool',

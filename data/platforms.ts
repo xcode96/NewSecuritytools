@@ -9,7 +9,7 @@ export interface Platform {
     hackers: string;
     features: string[];
     notableCompanies: string[];
-    link: string;
+    url: string;
 }
 
 export type PlatformCategory = 'Salesforce' | 'ServiceNow' | 'SAP' | 'Workday' | 'Oracle' | 'Microsoft 365';
@@ -26,7 +26,7 @@ export const platformsData: Platform[] = [
         hackers: "800,000+",
         features: ["Private Programs", "Public Programs", "Live Hacking Events", "Bounty Splitting"],
         notableCompanies: ["Twitter", "Uber", "Shopify", "GitLab", "Dropbox"],
-        link: "https://www.hackerone.com/"
+        url: "https://www.hackerone.com/"
     },
     {
         id: '2',
@@ -39,7 +39,7 @@ export const platformsData: Platform[] = [
         hackers: "500,000+",
         features: ["Bug Bounty", "VDP", "Penetration Testing", "Security Assessments"],
         notableCompanies: ["Tesla", "Mozilla", "Western Union", "MasterCard", "Fitbit"],
-        link: "https://www.bugcrowd.com/"
+        url: "https://www.bugcrowd.com/"
     },
     {
         id: '3',
@@ -52,7 +52,7 @@ export const platformsData: Platform[] = [
         hackers: "1,500+",
         features: ["Red Team", "Continuous Testing", "AI-Powered", "Elite Researchers"],
         notableCompanies: ["DoD", "Fortune 500", "Government", "Financial Services"],
-        link: "https://www.synack.com/"
+        url: "https://www.synack.com/"
     },
     {
         id: '4',
@@ -65,7 +65,7 @@ export const platformsData: Platform[] = [
         hackers: "100,000+",
         features: ["Bug Bounty", "VDP", "Compliance", "Training"],
         notableCompanies: ["European Commission", "ING", "Atos", "Proximus"],
-        link: "https://www.intigriti.com/"
+        url: "https://www.intigriti.com/"
     },
     {
         id: '5',
@@ -78,7 +78,7 @@ export const platformsData: Platform[] = [
         hackers: "50,000+",
         features: ["Bug Bounty", "VDP", "Pentest", "Compliance"],
         notableCompanies: ["Orange", "BNP Paribas", "Société Générale", "Airbus"],
-        link: "https://www.yeswehack.com/"
+        url: "https://www.yeswehack.com/"
     },
     {
         id: '6',
@@ -91,7 +91,7 @@ export const platformsData: Platform[] = [
         hackers: "400+",
         features: ["Pentest as a Service", "Agile Pentesting", "Continuous Testing"],
         notableCompanies: ["Veracrypt", "Recorded Future", "DataSite", "Kenna Security"],
-        link: "https://www.cobalt.io/"
+        url: "https://www.cobalt.io/"
     },
     {
         id: '7',
@@ -104,59 +104,7 @@ export const platformsData: Platform[] = [
         hackers: "20,000+",
         features: ["Free Service", "Responsible Disclosure", "Website Scanning"],
         notableCompanies: ["Any Website Owner", "Non-profit", "Educational"],
-        link: "https://www.openbugbounty.org/"
-    },
-    {
-        id: '8',
-        name: "Zerocopter",
-        type: "Platform",
-        rating: "Good",
-        founded: "2015",
-        description: "Dutch crowdsourced security platform focusing on continuous security testing.",
-        payoutRange: "$50 - $10,000+",
-        hackers: "15,000+",
-        features: ["Continuous Testing", "Compliance", "Managed Programs"],
-        notableCompanies: ["Dutch Government", "Financial Institutions", "Healthcare"],
-        link: "https://www.zerocopter.com/"
-    },
-    {
-        id: '9',
-        name: "SafeHats",
-        type: "Platform",
-        rating: "Good",
-        founded: "2017",
-        description: "Indian bug bounty platform connecting security researchers with organizations.",
-        payoutRange: "$25 - $5,000+",
-        hackers: "10,000+",
-        features: ["Bug Bounty", "VDP", "Security Consulting"],
-        notableCompanies: ["Indian Startups", "Government", "SMEs"],
-        link: "https://www.safehats.com/"
-    },
-    {
-        id: '10',
-        name: "Detectify",
-        type: "Scanner + Crowdsource",
-        rating: "Very Good",
-        founded: "2013",
-        description: "Automated web application security scanner with crowdsourced modules.",
-        payoutRange: "$500 - $30,000+",
-        hackers: "300+",
-        features: ["Automated Scanning", "Crowdsourced Modules", "Continuous Monitoring"],
-        notableCompanies: ["Spotify", "Trello", "King", "Minecraft"],
-        link: "https://detectify.com/"
-    },
-    {
-        id: '11',
-        name: "BugHunt",
-        type: "Platform",
-        rating: "Good",
-        founded: "2019",
-        description: "Brazilian bug bounty platform focusing on local and international programs.",
-        payoutRange: "$50 - $10,000+",
-        hackers: "20,000+",
-        features: ["Bug Bounty", "VDP", "Security Research"],
-        notableCompanies: ["Brazilian Companies", "Latin America"],
-        link: "https://www.bughunt.com.br/"
+        url: "https://www.openbugbounty.org/"
     },
     {
         id: '12',
@@ -169,6 +117,6 @@ export const platformsData: Platform[] = [
         hackers: "5,000+",
         features: ["Continuous Testing", "DevSecOps Integration", "Expert Network"],
         notableCompanies: ["Startups", "Scale-ups", "Enterprise"],
-        link: "https://www.federacy.com/"
+        url: "https://www.federacy.com/"
     }
 ];

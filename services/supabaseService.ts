@@ -254,7 +254,7 @@ export const fetchBooks = async (): Promise<any[]> => {
     }));
 };
 
-export const addBook = async (book: any): Promise<boolean> => {
+export const addBook = async (book: any): Promise<{ success: boolean; error?: any }> => {
     // Map camelCase to snake_case
     const dbItem = {
         title: book.title,
@@ -274,9 +274,9 @@ export const addBook = async (book: any): Promise<boolean> => {
 
     if (error) {
         console.error('Error adding book:', error);
-        return false;
+        return { success: false, error };
     }
-    return true;
+    return { success: true };
 };
 
 export const updateBook = async (id: number, book: any): Promise<boolean> => {

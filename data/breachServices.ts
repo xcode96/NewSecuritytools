@@ -10,7 +10,7 @@ export interface BreachService {
     icon: string;
     keyFeatures: string[];
     tags: string[];
-    link: string;
+    url: string;
 }
 
 export const breachServices: BreachService[] = [
@@ -23,7 +23,7 @@ export const breachServices: BreachService[] = [
         icon: '🛡️',
         keyFeatures: ['Email Check', 'Phone Check', 'Password Check', 'Breach Database'],
         tags: ['Email', 'Breach Check', 'Free', 'Popular'],
-        link: '#'
+        url: 'https://haveibeenpwned.com/'
     },
     {
         id: '2',
@@ -34,7 +34,7 @@ export const breachServices: BreachService[] = [
         icon: '🔍',
         keyFeatures: ['Email Search', 'Domain Search', 'API Access', 'Detailed Results'],
         tags: ['API', 'Detailed', 'Domain Search', 'Professional'],
-        link: '#'
+        url: 'https://breachdirectory.org/'
     },
     {
         id: '3',
@@ -45,7 +45,7 @@ export const breachServices: BreachService[] = [
         icon: '🔐',
         keyFeatures: ['Advanced Search', 'API Integration', 'Bulk Queries', 'Professional Tools'],
         tags: ['Professional', 'API', 'Bulk Search', 'Advanced'],
-        link: '#'
+        url: 'https://www.dehashed.com/'
     },
     {
         id: '4',
@@ -56,7 +56,7 @@ export const breachServices: BreachService[] = [
         icon: '🕵️',
         keyFeatures: ['Dark Web Search', 'Historical Data', 'OSINT Tools', 'Archive Access'],
         tags: ['OSINT', 'Dark Web', 'Intelligence', 'Archive'],
-        link: '#'
+        url: 'https://intelx.io/'
     },
     {
         id: '5',
@@ -67,7 +67,7 @@ export const breachServices: BreachService[] = [
         icon: '💾',
         keyFeatures: ['Credential Search', 'Personal Info', 'Multiple Formats', 'Regular Updates'],
         tags: ['Credentials', 'Personal Info', 'Extensive', 'Updated'],
-        link: '#'
+        url: 'https://snusbase.com/'
     },
     {
         id: '6',
@@ -78,7 +78,7 @@ export const breachServices: BreachService[] = [
         icon: '🔎',
         keyFeatures: ['Email Lookup', 'Simple Interface', 'Quick Results', 'Basic Search'],
         tags: ['Simple', 'Quick', 'Basic', 'Free'],
-        link: '#'
+        url: 'https://leak-lookup.com/'
     },
     {
         id: '7',
@@ -89,7 +89,7 @@ export const breachServices: BreachService[] = [
         icon: '📚',
         keyFeatures: ['Community Driven', 'Research Focus', 'Open Access', 'Educational'],
         tags: ['Community', 'Research', 'Educational', 'Open'],
-        link: '#'
+        url: 'https://breachdirectory.org/'
     }
 ];
 

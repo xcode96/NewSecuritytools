@@ -1,4 +1,4 @@
-export type BookCategory = 'Red Team' | 'Blue Team' | 'General';
+export type BookCategory = 'Red Team' | 'Blue Team' | 'General' | 'Enterprise Platforms';
 
 export interface Book {
     id: string;
@@ -168,6 +168,79 @@ export const booksData: Book[] = [
         category: "General",
         tags: ["Malware Analysis", "Reverse Engineering", "Practical"],
         amazonLink: "#",
+        rating: 5
+    },
+    // Enterprise Platforms
+    {
+        id: '14',
+        title: "Mastering Active Directory",
+        author: "Dishan Francis",
+        description: "Design, deploy, and protect Active Directory Domain Services for Windows Server 2022.",
+        year: "2021",
+        pages: "830 pages",
+        category: "Enterprise Platforms",
+        tags: ["Active Directory", "Windows Server", "Identity Management"],
+        amazonLink: "https://www.amazon.com/Mastering-Active-Directory-deploy-Services/dp/1801077716",
+        rating: 5
+    },
+    {
+        id: '15',
+        title: "Cloud Security: A Comprehensive Guide to Secure Cloud Computing",
+        author: "Ronald L. Krutz, Russell Dean Vines",
+        description: "Comprehensive overview of cloud security concepts, data protection, and compliance.",
+        year: "2010",
+        pages: "384 pages",
+        category: "Enterprise Platforms",
+        tags: ["Cloud Security", "AWS", "Azure"],
+        amazonLink: "https://www.amazon.com/Cloud-Security-Comprehensive-Secure-Computing/dp/0470589876",
+        rating: 5
+    },
+    {
+        id: '16',
+        title: "Kubernetes Security",
+        author: "Liz Rice, Michael Hausenblas",
+        description: "Operating Kubernetes clusters and applications safely and securely.",
+        year: "2019",
+        pages: "158 pages",
+        category: "Enterprise Platforms",
+        tags: ["Kubernetes", "Container Security", "DevSecOps"],
+        amazonLink: "https://www.amazon.com/Kubernetes-Security-Operating-Clusters-Applications/dp/1492039089",
+        rating: 5
+    },
+    {
+        id: '17',
+        title: "Enterprise Security Architecture",
+        author: "Nicholas Sherwood, Andrew Clark, David Lynas",
+        description: "A Business-Driven Approach to enterprise security architecture using the SABSA framework.",
+        year: "2005",
+        pages: "600 pages",
+        category: "Enterprise Platforms",
+        tags: ["Architecture", "SABSA", "Strategy"],
+        amazonLink: "https://www.amazon.com/Enterprise-Security-Architecture-Business-Driven-Approach/dp/157820318X",
+        rating: 5
+    },
+    {
+        id: '18',
+        title: "Docker Security",
+        author: "Adrian Mouat",
+        description: "Using Docker Safely: A guide to container security for developers and ops.",
+        year: "2015",
+        pages: "120 pages",
+        category: "Enterprise Platforms",
+        tags: ["Docker", "Containers", "DevOps"],
+        amazonLink: "https://www.amazon.com/Using-Docker-Safely-Adrian-Mouat/dp/1491932595",
+        rating: 5
+    },
+    {
+        id: '19',
+        title: "Microsoft Azure Security",
+        author: "Michael Howard, Yaniv Shaked",
+        description: "Designing and building secure cloud solutions on Microsoft Azure.",
+        year: "2020",
+        pages: "400 pages",
+        category: "Enterprise Platforms",
+        tags: ["Azure", "Microsoft", "Cloud"],
+        amazonLink: "https://www.amazon.com/Microsoft-Azure-Security-Michael-Howard/dp/1509303534",
         rating: 5
     }
 ];
