@@ -34,7 +34,10 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
 
                 return {
                     ...item,
-                    payoutRange: item.pricing_model,
+                    payoutRange: item.pricing_model, // For backward compatibility/bug bounty
+                    pricingModel: item.pricing_model,
+                    difficulty: item.difficulty,
+                    topics: item.topics || item.tags,
                     notableCompanies: item.notable_companies,
                     url: resolvedUrl,
                     link: resolvedUrl
@@ -187,7 +190,7 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
                     {/* Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredPlatforms.map((platform) => (
-                            <motion.div key={platform.id} whileHover={{ y: -5 }} className="group relative bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 p-6 hover:border-fuchsia-500/30 hover:shadow-xl transition-all duration-300">
+                            <motion.div key={platform.id} whileHover={{ y: -5 }} className="group relative bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 p-6 hover:border-fuchsia-500/30 hover:shadow-xl transition-all duration-300 flex flex-col">
                                 {isAdmin && (
                                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                         <button onClick={(e) => { e.stopPropagation(); handleEditClick(platform); }} className="p-1.5 bg-white dark:bg-slate-800 text-blue-500 rounded-lg shadow-sm hover:scale-110"><PencilIcon className="w-3 h-3" /></button>
@@ -196,9 +199,40 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
                                 )}
                                 <div className="flex justify-between items-start mb-4">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-fuchsia-500 transition-colors">{platform.name}</h3>
-                                    <span className="px-2 py-1 rounded text-xs font-bold bg-fuchsia-50 dark:bg-fuchsia-900/20 text-fuchsia-600 dark:text-fuchsia-400 uppercase">{platform.category}</span>
+                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${platform.pricingModel === 'Free' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-fuchsia-50 dark:bg-fuchsia-900/20 text-fuchsia-600 dark:text-fuchsia-400'}`}>
+                                        {platform.pricingModel || platform.category}
+                                    </span>
                                 </div>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{platform.description}</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex-grow">{platform.description}</p>
+
+                                {platform.difficulty && (
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Difficulty</span>
+                                            <span className="h-px flex-1 bg-slate-100 dark:bg-white/10"></span>
+                                        </div>
+                                        <span className="inline-block px-2 py-1 rounded-md bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+                                            {platform.difficulty}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {(platform.topics || []).length > 0 && (
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categories</span>
+                                            <span className="h-px flex-1 bg-slate-100 dark:bg-white/10"></span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {(platform.topics || []).slice(0, 5).map((topic: string, i: number) => (
+                                                <span key={i} className="px-2 py-0.5 rounded text-[10px] bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20">
+                                                    {topic}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="space-y-2 mb-6">
                                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Key Features</h4>
                                     <ul className="grid grid-cols-2 gap-2">
@@ -210,7 +244,7 @@ const PlatformsModal: React.FC<PlatformsModalProps> = ({ onClose, isOpen, isAdmi
                                         ))}
                                     </ul>
                                 </div>
-                                <a href={platform.url} target="_blank" rel="noopener noreferrer" className="block w-full py-2.5 rounded-xl bg-slate-50 dark:bg-white/5 text-center text-sm font-bold text-slate-600 dark:text-slate-300 group-hover:bg-fuchsia-600 group-hover:text-white transition-all">Explore Documentation</a>
+                                <a href={platform.url} target="_blank" rel="noopener noreferrer" className="mt-auto block w-full py-2.5 rounded-xl bg-slate-50 dark:bg-white/5 text-center text-sm font-bold text-slate-600 dark:text-slate-300 group-hover:bg-fuchsia-600 group-hover:text-white transition-all">Visit Platform</a>
                             </motion.div>
                         ))}
                     </div>

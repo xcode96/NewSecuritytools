@@ -24,6 +24,7 @@ import FrameworksModal from './components/FrameworksModal';
 import BreachServicesModal from './components/BreachServicesModal';
 import YouTubersModal from './components/YouTubersModal';
 import DataManagerModal from './components/DataManagerModal';
+import UpdatesModal from './components/UpdatesModal';
 import { Cheatsheets } from './components/Cheatsheets';
 
 import type { Tool, GeneratedToolDetails, ToolFormData, SubArticle, CategoryInfo, UserProfile } from './types';
@@ -54,7 +55,8 @@ import {
   LogoutIcon,
   DownloadIcon as DataIcon,
   UploadIcon,
-  MenuIcon
+  MenuIcon,
+  RssIcon
 } from './components/IconComponents';
 
 interface ArticleEditorState {
@@ -430,6 +432,7 @@ const App: React.FC = () => {
     { icon: <FrameworkIcon className="w-6 h-6" />, label: 'Frameworks', onClick: () => setActiveModal('frameworks') },
     { icon: <ShieldCheckIcon className="w-6 h-6" />, label: 'Breach', onClick: () => setActiveModal('breach') },
     { icon: <YoutubeIcon className="w-6 h-6" />, label: 'YouTubers', onClick: () => setActiveModal('youtubers') },
+    { icon: <RssIcon className="w-6 h-6" />, label: 'Updates', onClick: () => setActiveModal('updates') },
     ...(isAdminLoggedIn
       ? [
         { icon: <GridIcon className="w-6 h-6" />, label: 'Manage', onClick: () => setActiveModal('categoryManager') },
@@ -601,6 +604,7 @@ const App: React.FC = () => {
       <FrameworksModal isOpen={activeModal === 'frameworks'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <BreachServicesModal isOpen={activeModal === 'breach'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
       <YouTubersModal isOpen={activeModal === 'youtubers'} onClose={() => setActiveModal(null)} isAdmin={isAdminLoggedIn} />
+      <UpdatesModal isOpen={activeModal === 'updates'} onClose={() => setActiveModal(null)} />
       <CategoryManagerModal isOpen={activeModal === 'categoryManager'} onClose={() => setActiveModal(null)} categories={categories} onAddCategory={handleAddCategory} onEditCategory={handleUpdateCategory} onDeleteCategory={handleDeleteCategory} />
 
       {activeModal === 'submission' && (

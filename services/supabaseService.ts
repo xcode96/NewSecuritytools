@@ -397,10 +397,13 @@ export const fetchCertifications = async () => {
     // Map snake_case to camelCase
     return (data || []).map((item: any) => ({
         ...item,
-        jobMarket: item.job_market,
-        examFormat: item.exam_format,
-        keySkills: item.key_skills,
-        careerPaths: item.career_paths
+        jobMarket: Number(item.job_market || item.jobMarket || 0),
+        examFormat: item.exam_format || item.examFormat,
+        keySkills: item.key_skills || item.keySkills || [],
+        careerPaths: item.career_paths || item.careerPaths || [],
+        rating: Number(item.rating || 0),
+        difficulty: Number(item.difficulty || 0),
+        popularity: Number(item.popularity || 0)
     }));
 };
 

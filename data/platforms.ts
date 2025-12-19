@@ -10,6 +10,9 @@ export interface Platform {
     features: string[];
     notableCompanies: string[];
     url: string;
+    difficulty?: string;
+    topics?: string[];
+    pricingModel?: string;
 }
 
 export type PlatformCategory = 'Salesforce' | 'ServiceNow' | 'SAP' | 'Workday' | 'Oracle' | 'Microsoft 365';
