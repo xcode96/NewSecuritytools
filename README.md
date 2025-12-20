@@ -77,5 +77,5 @@ testings-main/
 - **Frontend:** React, TypeScript, Vite
 - **Styling:** CSS (Custom Glassmorphism), Tailwind CSS
 - **Animations:** Framer Motion (`motion`), GSAP
-- **Backend:** Supabase (PostgreSQL, Auth, Realtime)
+- **Backend:** Supabase (PostgreSQL, Auth, Realtime).
 - **Utilities:** `date-fns`, `uuid`, `@dnd-kit` (Drag & Drop)
