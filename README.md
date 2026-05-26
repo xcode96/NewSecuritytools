@@ -1,6 +1,6 @@
  # Cyber Security Toolkit
 
-## 🛡️ Project Purpose & Overviewc
+## 🛡️ Project Purpose & Overview
 
 The **Cyber Security Toolkit** is a comprehensive, interactive dashboard designed for cybersecurity professionals, students, and enthusiasts. It serves as a centralized hub for managing and exploring various cybersecurity resources.
 
